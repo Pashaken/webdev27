@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>DiceChess — Регистрация</title>
+</head>
+<body>
+    <h1>Регистрация в DiceChess</h1>
+    
+    <form action="/register" method="POST">
+        <div>
+            <label for="username">Имя пользователя:</label><br>
+            <input type="text" id="username" name="username" required minlength="3">
+        </div>
+        <br>
+        <div>
+            <label for="password">Пароль:</label><br>
+            <input type="password" id="password" name="password" required minlength="4">
+        </div>
+        <br>
+        <button type="submit">Создать аккаунт</button>
+    </form>
+
+    <hr>
+    <p>Уже зарегистрированы? <a href="login.html">Войти в игру</a></p>
+</body>
+</html>
