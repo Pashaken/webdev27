@@ -1,0 +1,29 @@
+<% content_for :title, "DiceChess — Регистрация" %>
+
+<h1>Регистрация в DiceChess</h1>
+
+<% if @user.errors.any? %>
+  <div>
+    <p>Не удалось зарегистрироваться:</p>
+    <ul>
+      <% @user.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @user, url: register_path do |form| %>
+  <p>
+    <%= form.label :username, "Никнейм" %><br>
+    <%= form.text_field :username, required: true, minlength: 3, maxlength: 50, autofocus: true, autocomplete: "username" %>
+  </p>
+  <p>
+    <%= form.label :password, "Пароль (минимум 6 символов)" %><br>
+    <%= form.password_field :password, required: true, minlength: 6, autocomplete: "new-password" %>
+  </p>
+  <p><%= form.submit "Создать аккаунт" %></p>
+<% end %>
+
+<hr>
+<p>Уже зарегистрированы? <%= link_to "Войти", login_path %></p>

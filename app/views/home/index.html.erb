@@ -1,0 +1,6 @@
+<% content_for :title, "DiceChess" %>
+
+<h1>Привет, <%= current_user.username %>!</h1>
+<p>Вы успешно вошли в DiceChess.</p>
+
+<%= button_to "Выйти", logout_path, method: :delete %>

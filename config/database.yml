@@ -1,0 +1,22 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
+  port: <%= ENV.fetch("DB_PORT", 5432) %>
+  username: <%= ENV.fetch("DB_USER", "postgres") %>
+  password: <%= ENV.fetch("DB_PASSWORD", "") %>
+
+development:
+  <<: *default
+  database: dicechess_db
+
+test:
+  <<: *default
+  database: dicechess_test
+
+production:
+  <<: *default
+  database: dicechess_production
+  username: dicechess
+  password: <%= ENV["DICECHESS_DATABASE_PASSWORD"] %>

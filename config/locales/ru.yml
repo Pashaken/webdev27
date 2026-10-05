@@ -1,0 +1,16 @@
+ru:
+  activerecord:
+    models:
+      user: Пользователь
+    attributes:
+      user:
+        username: Никнейм
+        password: Пароль
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      blank: не может быть пустым
+      taken: уже занят
+      too_short: слишком короткий (минимум %{count})
+      too_long: слишком длинный (максимум %{count})
+      invalid: имеет неверный формат
