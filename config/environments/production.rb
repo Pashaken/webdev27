@@ -11,9 +11,11 @@ Rails.application.configure do
 
   config.public_file_server.headers = { "cache-control" => "public, max-age=#{1.hour.to_i}" }
 
-  config.assume_ssl = true
+  ssl = ENV["FORCE_SSL"] == "true"
 
-  config.force_ssl = true
+  config.assume_ssl = ssl
+
+  config.force_ssl = ssl
 
   config.log_tags = [ :request_id ]
   config.logger   = ActiveSupport::TaggedLogging.logger(STDOUT)

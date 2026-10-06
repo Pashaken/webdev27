@@ -1,0 +1,10 @@
+.git
+.gitignore
+.env*
+/log/*
+/tmp/*
+/config/master.key
+/test
+Dockerfile
+compose.yaml
+README.md

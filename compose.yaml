@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: dicechess
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: dicechess_production
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dicechess -d dicechess_production"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      DATABASE_URL: postgres://dicechess:${DB_PASSWORD}@db:5432/dicechess_production
+      FORCE_SSL: ${FORCE_SSL:-false}
+    ports:
+      - "80:3000"
+
+volumes:
+  pgdata:
