@@ -1,0 +1,18 @@
+<%= tag.section class: [ "player-panel", ("is-active" if local_assigns[:active]) ] do %>
+  <span class="avatar"><%= name.first.upcase %></span>
+
+  <div class="player-info">
+    <span class="player-name"><%= name %></span>
+    <span class="player-meta">Рейтинг <%= rating %></span>
+  </div>
+
+  <% if local_assigns[:captured].present? %>
+    <div class="captured">
+      <% captured.each do |piece| %>
+        <%= tag.span class: "piece-icon", data: { piece: piece }, aria: { label: piece_label(piece) } %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%= tag.div clock, class: [ "clock", ("is-running" if local_assigns[:active]), ("is-low" if local_assigns[:low]) ] %>
+<% end %>

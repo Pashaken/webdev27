@@ -1,0 +1,19 @@
+<% flipped = local_assigns.fetch(:flipped, false) %>
+<% pieces = local_assigns.fetch(:pieces, {}) %>
+<% marks = local_assigns.fetch(:marks, {}) %>
+
+<div class="board" role="group" aria-label="Шахматная доска">
+  <% board_squares(flipped: flipped).each do |square| %>
+    <% square_marks = marks.fetch(square, []) %>
+    <%= tag.div class: [ "square", *(square_marks - [ :dragging, :draggable ]).map { |mark| "is-#{mark.to_s.dasherize}" } ],
+                data: { square: square,
+                        tone: square_tone(square),
+                        file: (square[0] if square[1] == (flipped ? "8" : "1")),
+                        rank: (square[1] if square[0] == (flipped ? "h" : "a")) } do %>
+      <% if (piece = pieces[square]) %>
+        <%= tag.span class: [ "piece", ("is-dragging" if square_marks.include?(:dragging)), ("is-draggable" if square_marks.include?(:draggable)) ],
+                     data: { piece: piece }, role: "img", aria: { label: piece_label(piece) } %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

@@ -1,0 +1,88 @@
+:root {
+  color-scheme: light dark;
+
+  --bg: light-dark(#f4f5fa, #0f1220);
+  --surface: light-dark(#ffffff, #181c2e);
+  --surface-muted: light-dark(#eceef6, #20253b);
+  --text: light-dark(#1b1f33, #e8eaf4);
+  --muted: light-dark(#626a84, #9aa1b9);
+  --border: light-dark(#dde0ec, #2a3050);
+
+  --accent: light-dark(#4f46e5, #818cf8);
+  --accent-hover: light-dark(#4338ca, #a5b0fb);
+  --accent-text: light-dark(#ffffff, #0f1220);
+  --ring: light-dark(rgb(79 70 229 / 0.28), rgb(129 140 248 / 0.35));
+
+  --danger: light-dark(#dc2626, #f87171);
+  --danger-hover: light-dark(#b91c1c, #fca5a5);
+  --danger-text: light-dark(#ffffff, #1f0a0a);
+
+  --success-bg: light-dark(#e8f6ed, #12301f);
+  --success-border: light-dark(#b5e0c3, #1f6b3c);
+  --success-text: light-dark(#14532d, #b8f0cd);
+  --error-bg: light-dark(#fdeded, #3a1618);
+  --error-border: light-dark(#f3c1c1, #7a2a30);
+  --error-text: light-dark(#7f1d1d, #ffd0d3);
+  --warning-bg: light-dark(#fff6e0, #3a2c0f);
+  --warning-border: light-dark(#f2d58a, #7a5a1a);
+  --warning-text: light-dark(#78510a, #ffe2a3);
+  --info-bg: light-dark(#e8f0fe, #14233f);
+  --info-border: light-dark(#b9cffa, #26467f);
+  --info-text: light-dark(#1e3a8a, #c4d8ff);
+
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  --font-pieces: "Segoe UI Symbol", "Noto Sans Symbols 2", "Apple Symbols", "DejaVu Sans", sans-serif;
+
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.5rem;
+  --text-2xl: 2rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-pill: 999px;
+
+  --shadow-color: light-dark(rgb(16 24 40 / 0.08), rgb(0 0 0 / 0.45));
+  --shadow: 0 1px 2px var(--shadow-color), 0 10px 30px var(--shadow-color);
+  --shadow-lg: 0 4px 12px var(--shadow-color), 0 24px 60px var(--shadow-color);
+
+  --container: 1180px;
+  --board-max: 640px;
+
+  --board-light: #dfe3f1;
+  --board-dark: #7f8fba;
+  --coord-on-light: #4d5b8c;
+  --coord-on-dark: #ffffff;
+  --board-selected: rgb(250 204 21 / 0.6);
+  --board-last-move: rgb(250 204 21 / 0.38);
+  --board-target: rgb(15 23 42 / 0.3);
+  --board-check: rgb(239 68 68 / 0.9);
+
+  --piece-white: #ffffff;
+  --piece-white-edge: #262b44;
+  --piece-black: #262b44;
+  --piece-black-edge: #e4e7f5;
+
+  --die-face: #fbfbfe;
+  --die-edge: #a3a9c8;
+  --die-pip: #1b1f33;
+  --die-shadow: 0 2px 0 rgb(15 23 42 / 0.18), 0 8px 16px rgb(15 23 42 / 0.2);
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}

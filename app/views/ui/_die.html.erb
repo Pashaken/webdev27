@@ -1,0 +1,16 @@
+<% state = local_assigns[:state] %>
+
+<div class="die-slot">
+  <%= tag.button "", type: "button",
+                 class: [ "die", ("is-#{state}" if state) ],
+                 data: { value: value },
+                 disabled: state == :blocked,
+                 aria: { pressed: state == :selected, label: "Кубик: #{value}" } %>
+
+  <% if local_assigns[:piece] %>
+    <span class="die-caption">
+      <%= tag.span class: "piece-icon", data: { piece: piece } %>
+      <%= piece_label(piece) %>
+    </span>
+  <% end %>
+</div>

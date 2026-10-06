@@ -1,6 +1,7 @@
 <% content_for :title, "DiceChess" %>
+<% content_for :main_class, "container-narrow" %>
 
-<h1>Привет, <%= current_user.username %>!</h1>
-<p>Вы успешно вошли в DiceChess.</p>
-
-<%= button_to "Выйти", logout_path, method: :delete %>
+<section class="card">
+  <h1 class="card-title">Привет, <%= current_user.username %>!</h1>
+  <p>Вы успешно вошли в DiceChess.</p>
+</section>

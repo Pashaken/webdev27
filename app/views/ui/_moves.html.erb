@@ -1,0 +1,17 @@
+<section class="moves-panel">
+  <h3 class="moves-title">Ходы</h3>
+
+  <ol class="move-list">
+    <% moves.each_slice(2).with_index(1) do |pair, number| %>
+      <li class="move-row">
+        <span class="move-no"><%= number %>.</span>
+        <% pair.each_with_index do |(san, die), index| %>
+          <%= tag.span class: [ "move", ("is-current" if local_assigns[:current] == [ number, index ]) ] do %>
+            <%= tag.span class: "die die-sm", data: { value: die }, aria: { label: "Кубик: #{die}" } %>
+            <%= san %>
+          <% end %>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+</section>

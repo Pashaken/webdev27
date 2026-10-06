@@ -1,0 +1,15 @@
+<% titles = { win: "Победа", loss: "Поражение", draw: "Ничья" } %>
+<% badges = { win: "badge-success", loss: "badge-error", draw: "badge-warning" } %>
+
+<%= tag.dialog class: "dialog", open: local_assigns[:open], aria: { labelledby: "result-title-#{outcome}" } do %>
+  <%= tag.div class: [ "result", "result-#{outcome}" ] do %>
+    <%= tag.h3 titles.fetch(outcome), class: "result-title", id: "result-title-#{outcome}" %>
+    <p class="result-reason"><%= reason %></p>
+    <%= tag.span "Рейтинг #{delta}", class: [ "badge", badges.fetch(outcome) ] %>
+  <% end %>
+
+  <div class="dialog-actions">
+    <button class="btn btn-ghost" type="button">В лобби</button>
+    <button class="btn btn-primary" type="button"><span class="icon icon-refresh" aria-hidden="true"></span> Реванш</button>
+  </div>
+<% end %>

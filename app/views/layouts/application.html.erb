@@ -4,16 +4,45 @@
     <title><%= content_for(:title) || "DiceChess" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
+    <script src="/ui/theme.js"></script>
+    <link rel="stylesheet" href="/ui/tokens.css">
+    <link rel="stylesheet" href="/ui/base.css">
+    <link rel="stylesheet" href="/ui/components.css">
+    <link rel="stylesheet" href="/ui/icons.css">
+    <link rel="stylesheet" href="/ui/game.css">
+    <%= yield :head %>
   </head>
 
   <body>
-    <% if notice %>
-      <p><%= notice %></p>
-    <% end %>
-    <% if alert %>
-      <p><strong><%= alert %></strong></p>
-    <% end %>
+    <header class="header">
+      <div class="container header-inner">
+        <%= link_to "DiceChess", root_path, class: "brand" %>
 
-    <%= yield %>
+        <nav class="nav">
+          <button class="btn btn-ghost btn-sm btn-icon" type="button" data-theme-toggle data-tooltip="Сменить тему" data-tooltip-pos="bottom" aria-label="Сменить тему">
+            <span class="icon icon-contrast" aria-hidden="true"></span>
+          </button>
+
+          <% if current_user %>
+            <span class="nav-user"><%= current_user.username %></span>
+            <%= button_to "Выйти", logout_path, method: :delete, class: "btn btn-ghost btn-sm", form_class: "nav-form" %>
+          <% else %>
+            <%= link_to "Войти", login_path, class: "nav-link" %>
+            <%= link_to "Регистрация", register_path, class: "btn btn-primary btn-sm" %>
+          <% end %>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container main <%= content_for(:main_class) %>">
+      <% if notice %>
+        <div class="alert alert-success"><%= notice %></div>
+      <% end %>
+      <% if alert %>
+        <div class="alert alert-error"><%= alert %></div>
+      <% end %>
+
+      <%= yield %>
+    </main>
   </body>
 </html>

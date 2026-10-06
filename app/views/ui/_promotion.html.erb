@@ -1,0 +1,14 @@
+<% color = local_assigns.fetch(:color, "w") %>
+
+<%= tag.dialog class: "dialog", open: local_assigns[:open], aria: { labelledby: "promotion-title" } do %>
+  <h3 class="dialog-title" id="promotion-title">Превращение пешки</h3>
+  <p class="muted">Выберите фигуру, в которую превратится пешка.</p>
+
+  <div class="promotion">
+    <% %w[q r b n].each do |type| %>
+      <%= tag.button type: "button", class: "promotion-choice", aria: { label: piece_label("#{color}#{type}") } do %>
+        <%= tag.span class: "piece-icon", data: { piece: "#{color}#{type}" } %>
+      <% end %>
+    <% end %>
+  </div>
+<% end %>

@@ -1,18 +1,22 @@
 <% content_for :title, "DiceChess — Вход" %>
+<% content_for :main_class, "container-narrow" %>
 
-<h1>Вход в DiceChess</h1>
+<section class="card">
+  <h1 class="card-title">Вход в DiceChess</h1>
 
-<%= form_with url: login_path do |form| %>
-  <p>
-    <%= form.label :username, "Никнейм" %><br>
-    <%= form.text_field :username, value: params[:username], required: true, autofocus: true, autocomplete: "username" %>
-  </p>
-  <p>
-    <%= form.label :password, "Пароль" %><br>
-    <%= form.password_field :password, required: true, autocomplete: "current-password" %>
-  </p>
-  <p><%= form.submit "Войти" %></p>
-<% end %>
+  <%= form_with url: login_path do |form| %>
+    <div class="field">
+      <%= form.label :username, "Никнейм", class: "label" %>
+      <%= form.text_field :username, value: params[:username], class: "input", required: true, autofocus: true, autocomplete: "username" %>
+    </div>
 
-<hr>
-<p>Впервые тут? <%= link_to "Зарегистрироваться", register_path %></p>
+    <div class="field">
+      <%= form.label :password, "Пароль", class: "label" %>
+      <%= form.password_field :password, class: "input", required: true, autocomplete: "current-password" %>
+    </div>
+
+    <%= form.submit "Войти", class: "btn btn-primary btn-block" %>
+  <% end %>
+
+  <p class="card-footer">Впервые тут? <%= link_to "Зарегистрироваться", register_path %></p>
+</section>

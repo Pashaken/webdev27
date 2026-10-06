@@ -1,0 +1,395 @@
+<% content_for :title, "DiceChess — UI-кит" %>
+<% content_for :head do %>
+  <link rel="stylesheet" href="/ui/guide.css">
+<% end %>
+
+<%
+  italian = fen_pieces("r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4")
+  italian_marks = {
+    "f8" => [ :last_move ], "c5" => [ :last_move ], "f3" => [ :selected ],
+    "d4" => [ :target ], "g5" => [ :target ], "h4" => [ :target ], "g1" => [ :target ],
+    "e5" => [ :capture ]
+  }
+  mate = fen_pieces("rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 1 3")
+  mate_marks = { "d8" => [ :last_move ], "h4" => [ :last_move ], "e1" => [ :check ] }
+  start = fen_pieces("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+  drag_marks = {
+    "e2" => [ :selected, :dragging ],
+    "e3" => [ :target, :clickable ],
+    "e4" => [ :target, :drop, :clickable ],
+    "d2" => [ :draggable ], "f2" => [ :draggable ]
+  }
+  moves = [ [ "e4", 1 ], [ "e5", 1 ], [ "Nf3", 2 ], [ "Nc6", 2 ], [ "Bc4", 3 ], [ "Bc5", 3 ] ]
+  pieces = %w[k q r b n p]
+  icons = %w[x check menu plus flag equal swap refresh dice user contrast]
+%>
+
+<div class="guide">
+  <header class="guide-intro">
+    <div class="guide-bar">
+      <h1>UI-кит DiceChess</h1>
+
+      <div class="segmented" role="radiogroup" aria-label="Тема">
+        <label><input type="radio" name="theme" id="theme-auto" checked> Авто</label>
+        <label><input type="radio" name="theme" id="theme-light"> Светлая</label>
+        <label><input type="radio" name="theme" id="theme-dark"> Тёмная</label>
+      </div>
+    </div>
+
+    <p class="muted">
+      Стили и компоненты для всего сайта: от форм входа до партии с двумя кубиками.
+      Файлы лежат в <code>public/ui/</code>, эта страница доступна только в development и test.
+    </p>
+
+    <nav class="tabs" aria-label="Разделы">
+      <a class="tab" href="#colors">Цвета</a>
+      <a class="tab" href="#typography">Текст</a>
+      <a class="tab" href="#buttons">Кнопки</a>
+      <a class="tab" href="#forms">Формы</a>
+      <a class="tab" href="#feedback">Уведомления</a>
+      <a class="tab" href="#data">Данные</a>
+      <a class="tab" href="#icons">Иконки</a>
+      <a class="tab" href="#states">Состояния</a>
+      <a class="tab" href="#menu">Меню</a>
+      <a class="tab" href="#board">Доска</a>
+      <a class="tab" href="#pieces">Фигуры</a>
+      <a class="tab" href="#dice">Кубики</a>
+      <a class="tab" href="#players">Игроки</a>
+      <a class="tab" href="#dialogs">Диалоги партии</a>
+      <a class="tab" href="#lobby">Лобби</a>
+      <a class="tab" href="#game">Партия</a>
+    </nav>
+  </header>
+
+  <section class="guide-section" id="colors">
+    <h2>Цвета</h2>
+    <p class="muted">Все цвета заданы токенами в <code>tokens.css</code> и сами переключаются между светлой и тёмной темой. Принудительно тему можно задать атрибутом <code>data-theme</code> на <code>html</code>, кнопка в шапке делает это и запоминает выбор.</p>
+
+    <% UiHelper::SWATCHES.each do |group, tokens| %>
+      <h3><%= group %></h3>
+      <div class="swatches">
+        <% tokens.each do |token| %>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(<%= token %>)"></div>
+            <code><%= token %></code>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </section>
+
+  <section class="guide-section" id="typography">
+    <h2>Текст</h2>
+    <div class="card">
+      <h1>Заголовок первого уровня</h1>
+      <h2>Заголовок второго уровня</h2>
+      <h3>Заголовок третьего уровня</h3>
+      <p>Обычный текст абзаца со <a href="#typography">ссылкой</a> и кодом <code>.btn-primary</code>.</p>
+      <p class="muted">Приглушённый текст для подсказок и подписей.</p>
+    </div>
+  </section>
+
+  <section class="guide-section" id="buttons">
+    <h2>Кнопки</h2>
+    <p class="muted"><code>.btn</code> + <code>.btn-primary</code>, <code>.btn-secondary</code>, <code>.btn-ghost</code>, <code>.btn-danger</code>; размеры <code>.btn-sm</code>, <code>.btn-lg</code>, <code>.btn-block</code>; кнопка-иконка <code>.btn-icon</code>.</p>
+    <div class="row">
+      <button class="btn btn-primary" type="button">Основная</button>
+      <button class="btn btn-secondary" type="button">Вторичная</button>
+      <button class="btn btn-ghost" type="button">Контурная</button>
+      <button class="btn btn-danger" type="button">Сдаться</button>
+      <button class="btn btn-primary" type="button" disabled>Недоступна</button>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary btn-sm" type="button">Маленькая</button>
+      <button class="btn btn-primary" type="button">Обычная</button>
+      <button class="btn btn-primary btn-lg" type="button">Крупная</button>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary" type="button"><span class="icon icon-dice" aria-hidden="true"></span> Бросить кубики</button>
+      <button class="btn btn-ghost" type="button"><span class="icon icon-equal" aria-hidden="true"></span> Ничья</button>
+      <button class="btn btn-ghost" type="button"><span class="icon icon-flag" aria-hidden="true"></span> Сдаться</button>
+      <button class="btn btn-ghost btn-icon" type="button" aria-label="Перевернуть доску"><span class="icon icon-swap" aria-hidden="true"></span></button>
+    </div>
+  </section>
+
+  <section class="guide-section" id="forms">
+    <h2>Формы</h2>
+    <div class="guide-grid">
+      <div class="field">
+        <label class="label" for="demo-nick">Никнейм</label>
+        <input class="input" id="demo-nick" value="alice">
+        <p class="field-hint">От 3 до 50 символов.</p>
+      </div>
+
+      <div class="field">
+        <label class="label" for="demo-password">Пароль</label>
+        <input class="input is-invalid" id="demo-password" type="password" value="12345">
+        <p class="field-error">Пароль слишком короткий (минимум 6).</p>
+      </div>
+
+      <div class="field">
+        <label class="label" for="demo-control">Контроль времени</label>
+        <select class="input" id="demo-control">
+          <option>5 минут</option>
+          <option>10 минут</option>
+          <option>15 + 10</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="label" for="demo-disabled">Недоступное поле</label>
+        <input class="input" id="demo-disabled" value="Только чтение" disabled>
+      </div>
+
+      <div class="field">
+        <label class="check"><input type="checkbox" checked> Играть на время</label>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="feedback">
+    <h2>Уведомления и диалог</h2>
+    <div class="guide-grid">
+      <div class="alert alert-success">Регистрация прошла успешно.</div>
+      <div class="alert alert-error">Неверный никнейм или пароль.</div>
+      <div class="alert alert-warning">Соперник отключился, ждём 30 секунд.</div>
+      <div class="alert alert-info">Ваш ход: выберите кубик.</div>
+    </div>
+
+    <div class="guide-dialog">
+      <dialog class="dialog" open>
+        <h3 class="dialog-title">Сдаться?</h3>
+        <p>Партия будет засчитана как поражение.</p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button">Отмена</button>
+          <button class="btn btn-danger" type="button">Сдаться</button>
+        </div>
+      </dialog>
+    </div>
+  </section>
+
+  <section class="guide-section" id="data">
+    <h2>Данные</h2>
+    <div class="row">
+      <span class="badge">Обычный</span>
+      <span class="badge badge-accent">Ход белых</span>
+      <span class="badge badge-success">Победа</span>
+      <span class="badge badge-error">Поражение</span>
+      <span class="badge badge-warning">Ничья</span>
+      <span class="avatar avatar-sm">A</span>
+      <span class="avatar">B</span>
+      <span class="avatar avatar-lg">C</span>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab is-active" type="button" role="tab">Лобби</button>
+      <button class="tab" type="button" role="tab">Мои партии</button>
+      <button class="tab" type="button" role="tab">Рейтинг</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Игрок</th>
+            <th class="num">Партии</th>
+            <th class="num">Победы</th>
+            <th class="num">Рейтинг</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% [ [ "alice", 42, 25, 1512 ], [ "bob", 38, 19, 1480 ], [ "carol", 12, 5, 1390 ] ].each do |name, games, wins, rating| %>
+            <tr>
+              <td><span class="row"><span class="avatar avatar-sm"><%= name.first.upcase %></span> <%= name %></span></td>
+              <td class="num"><%= games %></td>
+              <td class="num"><%= wins %></td>
+              <td class="num"><%= rating %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="guide-section" id="icons">
+    <h2>Иконки</h2>
+    <p class="muted"><code>&lt;span class="icon icon-flag"&gt;&lt;/span&gt;</code>: цвет берётся из текста, размер из шрифта. Набор небольшой и собран только из того, что нужно сайту.</p>
+    <div class="icon-grid">
+      <% icons.each do |name| %>
+        <div class="icon-cell">
+          <%= tag.span class: [ "icon", "icon-#{name}" ], aria: { hidden: true } %>
+          <code><%= name %></code>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <section class="guide-section" id="states">
+    <h2>Состояния</h2>
+    <p class="muted"><code>.spinner</code> и <code>.waiting</code> для ожидания, <code>.skeleton</code> для загрузки списков, <code>.empty</code> для пустых экранов.</p>
+    <div class="guide-grid guide-grid-wide">
+      <div class="guide-stack">
+        <div class="waiting"><span class="spinner" aria-hidden="true"></span> Ищем соперника…</div>
+        <div class="row"><span class="spinner" aria-hidden="true"></span><span class="muted">Загрузка</span></div>
+      </div>
+
+      <div class="card guide-stack" aria-busy="true">
+        <div class="row">
+          <span class="skeleton skeleton-avatar"></span>
+          <span class="skeleton skeleton-title"></span>
+        </div>
+        <span class="skeleton skeleton-line"></span>
+        <span class="skeleton skeleton-line"></span>
+      </div>
+
+      <div class="empty">
+        <span class="icon icon-dice" aria-hidden="true"></span>
+        <h3 class="empty-title">Пока нет партий</h3>
+        <p>Создайте первую партию или дождитесь соперника в лобби.</p>
+        <button class="btn btn-primary" type="button"><span class="icon icon-plus" aria-hidden="true"></span> Новая партия</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="menu">
+    <h2>Меню и подсказки</h2>
+    <p class="muted">Меню собрано на <code>&lt;details&gt;</code> и работает без скриптов. Список выпадает от левого края кнопки, для кнопки у правого края добавьте <code>.menu-end</code>. Подсказка берётся из <code>data-tooltip</code>, положение задаёт <code>data-tooltip-pos="bottom"</code>.</p>
+    <div class="guide-menu">
+      <details class="menu" open>
+        <summary class="btn btn-ghost"><span class="icon icon-menu" aria-hidden="true"></span> Действия</summary>
+        <ul class="menu-list">
+          <li><button class="menu-item" type="button"><span class="icon icon-swap" aria-hidden="true"></span> Перевернуть доску</button></li>
+          <li><button class="menu-item" type="button"><span class="icon icon-equal" aria-hidden="true"></span> Предложить ничью</button></li>
+          <li class="menu-divider" role="separator"></li>
+          <li><button class="menu-item is-danger" type="button"><span class="icon icon-flag" aria-hidden="true"></span> Сдаться</button></li>
+        </ul>
+      </details>
+    </div>
+    <div class="row">
+      <button class="btn btn-ghost" type="button" data-tooltip="Подсказка сверху">Наведите курсор</button>
+      <button class="btn btn-ghost" type="button" data-tooltip="Подсказка снизу" data-tooltip-pos="bottom">Или сюда</button>
+    </div>
+  </section>
+
+  <section class="guide-section" id="board">
+    <h2>Доска</h2>
+    <p class="muted">
+      Размер задаётся шириной контейнера (<code>--board-max</code>), фигуры и подписи масштабируются вместе с ней.
+      Состояния клетки: <code>.is-selected</code>, <code>.is-target</code>, <code>.is-capture</code>, <code>.is-last-move</code>, <code>.is-check</code>.
+      Для взаимодействия: <code>.is-clickable</code> (курсор и подсветка при наведении), <code>.is-drop</code> (куда можно бросить фигуру), на фигуре <code>.is-draggable</code> и <code>.is-dragging</code>.
+      Клетка получает <code>data-tone</code>, <code>data-file</code> и <code>data-rank</code> от разметки, поэтому доску можно отрисовать из ERB или из JS.
+    </p>
+    <div class="guide-grid guide-grid-wide">
+      <div class="guide-board"><%= render "ui/board", pieces: italian, marks: italian_marks %></div>
+      <div class="guide-board"><%= render "ui/board", pieces: mate, marks: mate_marks, flipped: true %></div>
+      <div class="guide-board"><%= render "ui/board", pieces: start, marks: drag_marks %></div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="pieces">
+    <h2>Фигуры</h2>
+    <p class="muted"><code>.piece</code> на доске и <code>.piece-icon</code> в тексте; код фигуры в <code>data-piece</code>: цвет <code>w</code>/<code>b</code> и тип <code>k q r b n p</code>.</p>
+    <% %w[w b].each do |color| %>
+      <div class="pieces-grid">
+        <% pieces.each_with_index do |type, index| %>
+          <%= tag.div class: [ "piece-sample", ("is-dark" if index.odd?) ] do %>
+            <%= tag.span class: "piece", data: { piece: "#{color}#{type}" }, role: "img", aria: { label: piece_label("#{color}#{type}") } %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+    <p>
+      В тексте:
+      <% pieces.each do |type| %>
+        <%= tag.span class: "piece-icon", data: { piece: "w#{type}" } %>
+      <% end %>
+      <% pieces.each do |type| %>
+        <%= tag.span class: "piece-icon", data: { piece: "b#{type}" } %>
+      <% end %>
+    </p>
+  </section>
+
+  <section class="guide-section" id="dice">
+    <h2>Кубики</h2>
+    <p class="muted">
+      Игрок бросает два кубика и выбирает, значением какого из них ходить. Грани рисуются стилями по <code>data-value</code> от 1 до 6, размер меняется через <code>--die-size</code>.
+      Состояния: <code>.is-selected</code> выбран, <code>.is-blocked</code> и <code>disabled</code> нет допустимых ходов, <code>.is-rolling</code> бросок.
+    </p>
+
+    <h3>Лоток с кубиками</h3>
+    <div class="dice-tray">
+      <%= render "ui/die", value: 2, state: :selected, piece: "wn" %>
+      <%= render "ui/die", value: 5, piece: "wq" %>
+    </div>
+
+    <h3>Грани и состояния</h3>
+    <div class="row">
+      <% (1..6).each do |value| %>
+        <%= render "ui/die", value: value %>
+      <% end %>
+    </div>
+    <div class="row">
+      <%= render "ui/die", value: 4 %>
+      <%= render "ui/die", value: 4, state: :selected %>
+      <%= render "ui/die", value: 4, state: :blocked %>
+      <%= render "ui/die", value: 4, state: :rolling %>
+    </div>
+  </section>
+
+  <section class="guide-section" id="players">
+    <h2>Игроки, часы и ходы</h2>
+    <div class="guide-grid guide-grid-wide">
+      <div class="guide-stack">
+        <%= render "ui/player", name: "bob", rating: 1480, clock: "09:42", captured: %w[wp wn] %>
+        <%= render "ui/player", name: "alice", rating: 1512, clock: "08:15", active: true %>
+        <%= render "ui/player", name: "carol", rating: 1390, clock: "00:09", active: true, low: true %>
+      </div>
+      <%= render "ui/moves", moves: moves, current: [ 3, 1 ] %>
+    </div>
+  </section>
+
+  <section class="guide-section" id="dialogs">
+    <h2>Диалоги партии</h2>
+    <p class="muted">Превращение пешки и окно результата. На сайте их открывает <code>dialog.showModal()</code>, здесь они показаны открытыми.</p>
+    <div class="guide-grid guide-grid-wide">
+      <div class="guide-dialog"><%= render "ui/promotion", color: "w", open: true %></div>
+      <div class="guide-dialog"><%= render "ui/result", outcome: :win, reason: "Мат в 23 хода", delta: "+12", open: true %></div>
+      <div class="guide-dialog"><%= render "ui/result", outcome: :loss, reason: "Истекло время", delta: "−9", open: true %></div>
+      <div class="guide-dialog"><%= render "ui/result", outcome: :draw, reason: "Пат", delta: "+1", open: true %></div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="lobby">
+    <h2>Лобби</h2>
+    <div class="game-list">
+      <%= render "ui/game_card", white: [ "alice", 1512 ], black: [ "bob", 1480 ], control: "10 минут", action: "Играть" %>
+      <%= render "ui/game_card", white: [ "carol", 1390 ], black: [ "dave", 1405 ], control: "5 минут", action: "Смотреть" %>
+      <%= render "ui/game_card", white: [ "erin", 1620 ], black: [ "frank", 1588 ], control: "15 + 10", action: "Смотреть" %>
+    </div>
+  </section>
+
+  <section class="guide-section" id="game">
+    <h2>Партия целиком</h2>
+    <div class="game">
+      <div class="game-main">
+        <%= render "ui/player", name: "bob", rating: 1480, clock: "09:42" %>
+        <%= render "ui/board", pieces: italian, marks: italian_marks %>
+        <%= render "ui/player", name: "alice", rating: 1512, clock: "08:15", active: true %>
+
+        <div class="dice-tray">
+          <%= render "ui/die", value: 2, state: :selected, piece: "wn" %>
+          <%= render "ui/die", value: 5, piece: "wq" %>
+        </div>
+      </div>
+
+      <aside class="game-side">
+        <div class="alert alert-info">Ваш ход: выберите кубик и фигуру.</div>
+        <%= render "ui/moves", moves: moves, current: [ 3, 1 ] %>
+        <div class="game-controls">
+          <button class="btn btn-ghost" type="button"><span class="icon icon-equal" aria-hidden="true"></span> Ничья</button>
+          <button class="btn btn-danger" type="button"><span class="icon icon-flag" aria-hidden="true"></span> Сдаться</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+</div>

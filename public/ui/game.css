@@ -1,0 +1,553 @@
+.board {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: 100%;
+  max-width: var(--board-max);
+  margin-inline: auto;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+  user-select: none;
+}
+
+.square {
+  --tone: var(--board-light);
+  --coord: var(--coord-on-light);
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  background-color: var(--tone);
+  background-image: var(--hover, none), var(--tint, none), var(--mark, none);
+}
+
+.square[data-tone="dark"] {
+  --tone: var(--board-dark);
+  --coord: var(--coord-on-dark);
+}
+
+.square[data-file]::after {
+  content: attr(data-file);
+  position: absolute;
+  right: 5%;
+  bottom: 3%;
+  color: var(--coord);
+  font-size: 2.2cqw;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.square[data-rank]::before {
+  content: attr(data-rank);
+  position: absolute;
+  top: 4%;
+  left: 5%;
+  color: var(--coord);
+  font-size: 2.2cqw;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.square.is-last-move {
+  --tint: linear-gradient(var(--board-last-move), var(--board-last-move));
+}
+
+.square.is-selected {
+  --tint: linear-gradient(var(--board-selected), var(--board-selected));
+}
+
+.square.is-target {
+  --mark: radial-gradient(circle, var(--board-target) 0 19%, transparent 20%);
+  cursor: pointer;
+}
+
+.square.is-capture {
+  --mark: radial-gradient(circle, transparent 0 54%, var(--board-target) 55% 68%, transparent 69%);
+  cursor: pointer;
+}
+
+.square.is-check {
+  --mark: radial-gradient(circle, var(--board-check) 0, rgb(239 68 68 / 0) 72%);
+}
+
+.square.is-clickable {
+  cursor: pointer;
+}
+
+.square.is-clickable:hover {
+  --hover: linear-gradient(rgb(255 255 255 / 0.3), rgb(255 255 255 / 0.3));
+}
+
+.square.is-drop {
+  box-shadow: inset 0 0 0 0.7cqw var(--accent);
+}
+
+.square:focus-visible {
+  outline: 0.7cqw solid var(--accent);
+  outline-offset: -0.7cqw;
+}
+
+.piece.is-draggable {
+  cursor: grab;
+}
+
+.piece.is-dragging {
+  cursor: grabbing;
+  filter: drop-shadow(0 1cqw 1cqw rgb(0 0 0 / 0.4));
+  opacity: 0.85;
+  transform: scale(1.14);
+}
+
+.piece,
+.piece-icon {
+  --glyph: "";
+  font-family: var(--font-pieces);
+  line-height: 1;
+  color: var(--piece-fill);
+  -webkit-text-stroke: 0.07em var(--piece-edge);
+  paint-order: stroke fill;
+}
+
+.piece::before,
+.piece-icon::before {
+  content: var(--glyph);
+}
+
+.piece {
+  display: block;
+  font-size: 10.4cqw;
+  text-shadow: 0 0.04em 0.06em rgb(0 0 0 / 0.3);
+}
+
+.piece-icon {
+  display: inline-block;
+  font-size: 1.6rem;
+  vertical-align: middle;
+}
+
+:is(.piece, .piece-icon)[data-piece^="w"] {
+  --piece-fill: var(--piece-white);
+  --piece-edge: var(--piece-white-edge);
+}
+
+:is(.piece, .piece-icon)[data-piece^="b"] {
+  --piece-fill: var(--piece-black);
+  --piece-edge: var(--piece-black-edge);
+}
+
+:is(.piece, .piece-icon)[data-piece$="k"] {
+  --glyph: "\265A\FE0E";
+}
+
+:is(.piece, .piece-icon)[data-piece$="q"] {
+  --glyph: "\265B\FE0E";
+}
+
+:is(.piece, .piece-icon)[data-piece$="r"] {
+  --glyph: "\265C\FE0E";
+}
+
+:is(.piece, .piece-icon)[data-piece$="b"] {
+  --glyph: "\265D\FE0E";
+}
+
+:is(.piece, .piece-icon)[data-piece$="n"] {
+  --glyph: "\265E\FE0E";
+}
+
+:is(.piece, .piece-icon)[data-piece$="p"] {
+  --glyph: "\265F\FE0E";
+}
+
+.die {
+  --pip-r: calc(var(--die-size, 72px) * 0.085);
+  --tl: radial-gradient(circle at 26% 26%, var(--die-pip) var(--pip-r), transparent calc(var(--pip-r) + 0.6px));
+  --tr: radial-gradient(circle at 74% 26%, var(--die-pip) var(--pip-r), transparent calc(var(--pip-r) + 0.6px));
+  --ml: radial-gradient(circle at 26% 50%, var(--die-pip) var(--pip-r), transparent calc(var(--pip-r) + 0.6px));
+  --mc: radial-gradient(circle at 50% 50%, var(--die-pip) var(--pip-r), transparent calc(var(--pip-r) + 0.6px));
+  --mr: radial-gradient(circle at 74% 50%, var(--die-pip) var(--pip-r), transparent calc(var(--pip-r) + 0.6px));
+  --bl: radial-gradient(circle at 26% 74%, var(--die-pip) var(--pip-r), transparent calc(var(--pip-r) + 0.6px));
+  --br: radial-gradient(circle at 74% 74%, var(--die-pip) var(--pip-r), transparent calc(var(--pip-r) + 0.6px));
+  display: block;
+  flex: none;
+  width: var(--die-size, 72px);
+  height: var(--die-size, 72px);
+  padding: 0;
+  background-color: var(--die-face);
+  background-repeat: no-repeat;
+  border: 2px solid var(--die-edge);
+  border-radius: 20%;
+  box-shadow: var(--die-shadow);
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+button.die {
+  cursor: pointer;
+}
+
+button.die:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.die[data-value="1"] {
+  background-image: var(--mc);
+}
+
+.die[data-value="2"] {
+  background-image: var(--tl), var(--br);
+}
+
+.die[data-value="3"] {
+  background-image: var(--tl), var(--mc), var(--br);
+}
+
+.die[data-value="4"] {
+  background-image: var(--tl), var(--tr), var(--bl), var(--br);
+}
+
+.die[data-value="5"] {
+  background-image: var(--tl), var(--tr), var(--mc), var(--bl), var(--br);
+}
+
+.die[data-value="6"] {
+  background-image: var(--tl), var(--tr), var(--ml), var(--mr), var(--bl), var(--br);
+}
+
+.die.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--ring), var(--die-shadow);
+  transform: translateY(-4px);
+}
+
+.die.is-blocked,
+.die:disabled {
+  opacity: 0.4;
+  filter: grayscale(0.5);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.die.is-rolling {
+  animation: die-roll 0.5s ease-in-out infinite;
+}
+
+.die-sm {
+  --die-size: 24px;
+  border-width: 1px;
+  box-shadow: none;
+}
+
+@keyframes die-roll {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+
+  25% {
+    transform: rotate(-14deg) translateY(-6px) scale(1.04);
+  }
+
+  50% {
+    transform: rotate(10deg) translateY(0) scale(1);
+  }
+
+  75% {
+    transform: rotate(-8deg) translateY(-4px) scale(1.03);
+  }
+
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.dice-tray {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: var(--space-5) var(--space-4);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.die-slot {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+}
+
+.die-caption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.die-caption .piece-icon {
+  font-size: 1.3rem;
+}
+
+.player-panel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.player-panel.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.player-info {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.player-name {
+  overflow: hidden;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-meta {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.captured {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.captured .piece-icon {
+  margin-right: -0.35em;
+  font-size: 1.3rem;
+}
+
+.clock {
+  padding: 4px 12px;
+  background: var(--surface-muted);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xl);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.clock.is-running {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.clock.is-low {
+  background: var(--danger);
+  color: var(--danger-text);
+}
+
+.moves-panel {
+  max-height: 340px;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.moves-title {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-base);
+}
+
+.move-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.move-row {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr 1fr;
+  align-items: center;
+  padding: 4px var(--space-3);
+}
+
+.move-row:nth-child(even) {
+  background: var(--surface-muted);
+}
+
+.move-no {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.move {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.move.is-current {
+  background: var(--accent);
+  color: var(--accent-text);
+}
+
+.game {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.game-main,
+.game-side {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.game-main > .board {
+  margin-block: calc(var(--space-1) * -1);
+}
+
+.game-controls {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.game-controls .btn {
+  flex: 1;
+}
+
+.promotion {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.promotion-choice {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 0;
+  background: var(--board-light);
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+}
+
+.promotion-choice:nth-child(even) {
+  background: var(--board-dark);
+}
+
+.promotion-choice:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.promotion-choice .piece-icon {
+  font-size: 3rem;
+}
+
+.result {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  text-align: center;
+}
+
+.result-title {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.result-reason {
+  margin: 0 0 var(--space-2);
+  color: var(--muted);
+}
+
+.result-win .result-title {
+  color: var(--success-text);
+}
+
+.result-loss .result-title {
+  color: var(--error-text);
+}
+
+.result-draw .result-title {
+  color: var(--warning-text);
+}
+
+.game-list {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.game-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.game-card-players {
+  display: grid;
+  flex: 1 1 200px;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.game-card-player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 600;
+}
+
+.game-card-player .piece-icon {
+  font-size: 1.1rem;
+}
+
+.game-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+@media (max-width: 860px) {
+  .game {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .dice-tray {
+    gap: var(--space-5);
+  }
+
+  .clock {
+    font-size: var(--text-lg);
+  }
+}

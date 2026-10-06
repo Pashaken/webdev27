@@ -66,11 +66,11 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   test "login with wrong password or unknown nickname fails with the same message" do
     post login_path, params: { username: "alice", password: "wrong-password" }
     assert_response :unprocessable_entity
-    assert_select "p strong", "Неверный никнейм или пароль."
+    assert_select ".alert-error", "Неверный никнейм или пароль."
 
     post login_path, params: { username: "nobody", password: "secret123" }
     assert_response :unprocessable_entity
-    assert_select "p strong", "Неверный никнейм или пароль."
+    assert_select ".alert-error", "Неверный никнейм или пароль."
 
     get root_path
     assert_redirected_to login_path
