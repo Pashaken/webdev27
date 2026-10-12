@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>DiceChess — UI-кит</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <script src="ui/theme.js"></script>
+    <link rel="stylesheet" href="ui/tokens.css">
+    <link rel="stylesheet" href="ui/base.css">
+    <link rel="stylesheet" href="ui/components.css">
+    <link rel="stylesheet" href="ui/icons.css">
+    <link rel="stylesheet" href="ui/game.css">
+    <link rel="stylesheet" href="ui/guide.css">
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="container header-inner">
+        <a class="brand" href="ui-kit.html">DiceChess</a>
+
+        <nav class="nav">
+          <button class="btn btn-ghost btn-sm btn-icon" type="button" data-theme-toggle data-tooltip="Сменить тему" data-tooltip-pos="bottom" data-tooltip-align="end" aria-label="Сменить тему">
+            <span class="icon icon-contrast" aria-hidden="true"></span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container main">
+      
+
+<div class="guide">
+  <header class="guide-intro">
+    <div class="guide-bar">
+      <h1>UI-кит DiceChess</h1>
+
+      <div class="segmented" role="radiogroup" aria-label="Тема">
+        <label><input type="radio" name="theme" id="theme-auto" checked> Авто</label>
+        <label><input type="radio" name="theme" id="theme-light"> Светлая</label>
+        <label><input type="radio" name="theme" id="theme-dark"> Тёмная</label>
+      </div>
+    </div>
+
+    <p class="muted">
+      Верстка и стили всех элементов интерфейса сайта: шрифты, кнопки, формы, карточки и компоненты партии с двумя кубиками.
+      В конце страницы собраны готовые экраны с заглушками. Файлы лежат в <code>public/ui/</code>.
+    </p>
+
+    <nav class="tabs" aria-label="Разделы">
+      <a class="tab" href="#colors">Цвета</a>
+      <a class="tab" href="#typography">Шрифты</a>
+      <a class="tab" href="#buttons">Кнопки</a>
+      <a class="tab" href="#forms">Формы</a>
+      <a class="tab" href="#feedback">Уведомления</a>
+      <a class="tab" href="#data">Данные</a>
+      <a class="tab" href="#icons">Иконки</a>
+      <a class="tab" href="#states">Состояния</a>
+      <a class="tab" href="#menu">Меню</a>
+      <a class="tab" href="#board">Доска</a>
+      <a class="tab" href="#pieces">Фигуры</a>
+      <a class="tab" href="#dice">Кубики</a>
+      <a class="tab" href="#players">Игроки</a>
+      <a class="tab" href="#dialogs">Диалоги партии</a>
+      <a class="tab" href="#gameforms">Формы партии</a>
+      <a class="tab" href="#lobby">Карточки партий</a>
+      <a class="tab" href="#game">Партия</a>
+      <a class="tab" href="#screens">Экраны</a>
+    </nav>
+  </header>
+
+  <section class="guide-section" id="colors">
+    <h2>Цвета</h2>
+    <p class="muted">Все цвета заданы токенами в <code>tokens.css</code> и сами переключаются между светлой и тёмной темой. Принудительно тему можно задать атрибутом <code>data-theme</code> на <code>html</code>, кнопка в шапке делает это и запоминает выбор.</p>
+
+      <h3>Интерфейс</h3>
+      <div class="swatches">
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--bg)"></div>
+            <code>--bg</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--surface)"></div>
+            <code>--surface</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--surface-muted)"></div>
+            <code>--surface-muted</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--border)"></div>
+            <code>--border</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--text)"></div>
+            <code>--text</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--muted)"></div>
+            <code>--muted</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--accent)"></div>
+            <code>--accent</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--accent-hover)"></div>
+            <code>--accent-hover</code>
+          </div>
+      </div>
+      <h3>Статусы</h3>
+      <div class="swatches">
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--success-bg)"></div>
+            <code>--success-bg</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--success-border)"></div>
+            <code>--success-border</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--error-bg)"></div>
+            <code>--error-bg</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--error-border)"></div>
+            <code>--error-border</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--warning-bg)"></div>
+            <code>--warning-bg</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--warning-border)"></div>
+            <code>--warning-border</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--info-bg)"></div>
+            <code>--info-bg</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--info-border)"></div>
+            <code>--info-border</code>
+          </div>
+      </div>
+      <h3>Доска</h3>
+      <div class="swatches">
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--board-light)"></div>
+            <code>--board-light</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--board-dark)"></div>
+            <code>--board-dark</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--board-selected)"></div>
+            <code>--board-selected</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--board-last-move)"></div>
+            <code>--board-last-move</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--board-target)"></div>
+            <code>--board-target</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--board-check)"></div>
+            <code>--board-check</code>
+          </div>
+      </div>
+      <h3>Фигуры и кубики</h3>
+      <div class="swatches">
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--piece-white)"></div>
+            <code>--piece-white</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--piece-white-edge)"></div>
+            <code>--piece-white-edge</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--piece-black)"></div>
+            <code>--piece-black</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--piece-black-edge)"></div>
+            <code>--piece-black-edge</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--die-face)"></div>
+            <code>--die-face</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--die-edge)"></div>
+            <code>--die-edge</code>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background: var(--die-pip)"></div>
+            <code>--die-pip</code>
+          </div>
+      </div>
+  </section>
+
+  <section class="guide-section" id="typography">
+    <h2>Шрифты</h2>
+    <p class="muted">Шрифты системные: страница ничего не загружает и выглядит привычно на любой системе. Размеры и начертания заданы токенами <code>--text-*</code> и классами <code>.text-*</code>, <code>.fw-*</code>.</p>
+
+    <div class="guide-grid guide-grid-wide">
+      <div class="card font-card">
+        <span class="font-name">Основной · <code>--font</code></span>
+        <p class="text-2xl fw-700">Аа Бб Вв Gg Rr 123</p>
+        <p>АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+      </div>
+
+      <div class="card font-card">
+        <span class="font-name">Моноширинный · <code>--font-mono</code></span>
+        <p class="mono text-xl fw-700">09:42 · e2–e4 · +12</p>
+        <p class="mono">e4 Nf3 Bc4 O-O 1480 1512</p>
+      </div>
+
+      <div class="card font-card">
+        <span class="font-name">Шахматные символы · <code>--font-pieces</code></span>
+        <p class="font-pieces text-2xl">♔ ♕ ♖ ♗ ♘ ♙ ♚ ♛ ♜ ♝ ♞ ♟</p>
+      </div>
+    </div>
+
+    <h3>Шкала размеров</h3>
+    <div>
+        <div class="type-row">
+          <div><span>Display</span> <code>.display</code></div>
+          <p class="type-sample display">Ходи с умом</p>
+          <div>32–48 px, 800</div>
+        </div>
+        <div class="type-row">
+          <div><span>Заголовок 1</span> <code>h1</code></div>
+          <h1 class="type-sample">Лобби партий</h1>
+          <div>2 rem, 700</div>
+        </div>
+        <div class="type-row">
+          <div><span>Заголовок 2</span> <code>h2</code></div>
+          <h2 class="type-sample">Ваш профиль</h2>
+          <div>1.5 rem, 700</div>
+        </div>
+        <div class="type-row">
+          <div><span>Заголовок 3</span> <code>h3</code></div>
+          <h3 class="type-sample">Последние партии</h3>
+          <div>1.125 rem, 700</div>
+        </div>
+        <div class="type-row">
+          <div><span>Крупный</span> <code>.text-lg</code></div>
+          <p class="type-sample text-lg">Выберите кубик и сделайте ход</p>
+          <div>1.125 rem, 400</div>
+        </div>
+        <div class="type-row">
+          <div><span>Основной</span> <code>p</code></div>
+          <p class="type-sample">Партия начнётся, когда соперник примет вызов.</p>
+          <div>1 rem, 400</div>
+        </div>
+        <div class="type-row">
+          <div><span>Малый</span> <code>.text-sm</code></div>
+          <p class="type-sample text-sm">Рейтинг изменится после окончания партии</p>
+          <div>0.875 rem, 400</div>
+        </div>
+        <div class="type-row">
+          <div><span>Подпись</span> <code>.caption</code></div>
+          <p class="type-sample caption">Обновлено 2 минуты назад</p>
+          <div>0.8 rem, 400</div>
+        </div>
+        <div class="type-row">
+          <div><span>Код</span> <code>.mono</code></div>
+          <p class="type-sample mono">e2–e4 · 09:42 · +12</p>
+          <div>моноширинный, 400</div>
+        </div>
+    </div>
+
+    <h3>Начертания</h3>
+    <div class="row">
+      <span class="text-lg fw-500">Средний 500</span>
+      <span class="text-lg fw-600">Полужирный 600</span>
+      <span class="text-lg fw-700">Жирный 700</span>
+      <span class="text-lg fw-800">Сверхжирный 800</span>
+    </div>
+
+    <p>Текст со <a href="#typography">ссылкой</a>, <strong>выделением</strong> и <code>кодом</code> внутри абзаца.</p>
+  </section>
+
+  <section class="guide-section" id="buttons">
+    <h2>Кнопки</h2>
+    <p class="muted"><code>.btn</code> + <code>.btn-primary</code>, <code>.btn-secondary</code>, <code>.btn-ghost</code>, <code>.btn-danger</code>, <code>.btn-link</code>; размеры <code>.btn-sm</code>, <code>.btn-lg</code>, <code>.btn-block</code>; <code>.btn-icon</code>, <code>.btn-group</code>, состояния <code>disabled</code> и <code>.is-loading</code>.</p>
+    <div class="row">
+      <button class="btn btn-primary" type="button">Основная</button>
+      <button class="btn btn-secondary" type="button">Вторичная</button>
+      <button class="btn btn-ghost" type="button">Контурная</button>
+      <button class="btn btn-danger" type="button">Сдаться</button>
+      <button class="btn btn-link" type="button">Кнопка-ссылка</button>
+      <button class="btn btn-primary" type="button" disabled>Недоступна</button>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary btn-sm" type="button">Маленькая</button>
+      <button class="btn btn-primary" type="button">Обычная</button>
+      <button class="btn btn-primary btn-lg" type="button">Крупная</button>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary" type="button"><span class="icon icon-dice" aria-hidden="true"></span> Бросить кубики</button>
+      <button class="btn btn-ghost" type="button"><span class="icon icon-equal" aria-hidden="true"></span> Ничья</button>
+      <button class="btn btn-ghost" type="button"><span class="icon icon-flag" aria-hidden="true"></span> Сдаться</button>
+      <button class="btn btn-ghost btn-icon" type="button" aria-label="Перевернуть доску"><span class="icon icon-swap" aria-hidden="true"></span></button>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary is-loading" type="button"><span class="spinner" aria-hidden="true"></span> Ищем соперника</button>
+      <div class="btn-group" role="group" aria-label="Оформление доски">
+        <button class="btn btn-ghost btn-sm is-active" type="button">Классика</button>
+        <button class="btn btn-ghost btn-sm" type="button">Контраст</button>
+        <button class="btn btn-ghost btn-sm" type="button">Тёмная</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="forms">
+    <h2>Формы</h2>
+    <div class="guide-grid">
+      <div class="field">
+        <label class="label" for="demo-nick">Никнейм</label>
+        <input class="input" id="demo-nick" value="alice">
+        <p class="field-hint">От 3 до 50 символов.</p>
+      </div>
+
+      <div class="field">
+        <label class="label" for="demo-password">Пароль</label>
+        <input class="input is-invalid" id="demo-password" type="password" value="12345">
+        <p class="field-error">Пароль слишком короткий (минимум 6).</p>
+      </div>
+
+      <div class="field">
+        <label class="label" for="demo-control">Контроль времени</label>
+        <select class="input" id="demo-control">
+          <option>5 минут</option>
+          <option>10 минут</option>
+          <option>15 + 10</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="label" for="demo-disabled">Недоступное поле</label>
+        <input class="input" id="demo-disabled" value="Только чтение" disabled>
+      </div>
+
+      <div class="field">
+        <label class="label" for="demo-about">Свободный ввод</label>
+        <textarea class="input" id="demo-about" rows="4" maxlength="500" placeholder="Расскажите о себе"></textarea>
+        <p class="field-hint">До 500 символов.</p>
+      </div>
+
+      <div class="field">
+        <label class="label" for="demo-search">Поиск игрока</label>
+        <div class="input-group">
+          <input class="input" id="demo-search" placeholder="Никнейм">
+          <button class="btn btn-primary btn-icon" type="button" aria-label="Найти"><span class="icon icon-search" aria-hidden="true"></span></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="legend">Флажок, переключатель и выбор</span>
+        <div class="row">
+          <label class="check"><input type="checkbox" checked> Играть на время</label>
+          <label class="check"><input type="radio" name="demo-radio" checked> Белые</label>
+          <label class="check"><input type="radio" name="demo-radio"> Чёрные</label>
+          <label class="switch"><input type="checkbox"><span class="switch-track"></span> Звук</label>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="feedback">
+    <h2>Уведомления и диалог</h2>
+    <div class="guide-grid">
+      <div class="alert alert-success">Регистрация прошла успешно.</div>
+      <div class="alert alert-error">Неверный никнейм или пароль.</div>
+      <div class="alert alert-warning">Соперник отключился, ждём 30 секунд.</div>
+      <div class="alert alert-info">Ваш ход: выберите кубик.</div>
+    </div>
+
+    <div class="guide-dialog">
+      <dialog class="dialog" open>
+        <h3 class="dialog-title">Сдаться?</h3>
+        <p>Партия будет засчитана как поражение.</p>
+        <div class="dialog-actions">
+          <button class="btn btn-ghost" type="button">Отмена</button>
+          <button class="btn btn-danger" type="button">Сдаться</button>
+        </div>
+      </dialog>
+    </div>
+  </section>
+
+  <section class="guide-section" id="data">
+    <h2>Данные</h2>
+    <div class="row">
+      <span class="badge">Обычный</span>
+      <span class="badge badge-accent">Ход белых</span>
+      <span class="badge badge-success">Победа</span>
+      <span class="badge badge-error">Поражение</span>
+      <span class="badge badge-warning">Ничья</span>
+      <span class="avatar avatar-sm">A</span>
+      <span class="avatar">B</span>
+      <span class="avatar avatar-lg">C</span>
+    </div>
+
+    <div class="stats">
+        <div class="stat">
+          <span class="stat-value">42</span>
+          <span class="stat-label">Партии</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">25</span>
+          <span class="stat-label">Победы</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">13</span>
+          <span class="stat-label">Поражения</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">4</span>
+          <span class="stat-label">Ничьи</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">1512</span>
+          <span class="stat-label">Рейтинг</span>
+        </div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab is-active" type="button" role="tab">Лобби</button>
+      <button class="tab" type="button" role="tab">Мои партии</button>
+      <button class="tab" type="button" role="tab">Рейтинг</button>
+    </div>
+
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Игрок</th>
+            <th class="num">Партии</th>
+            <th class="num">Победы</th>
+            <th class="num">Рейтинг</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr>
+              <td><span class="row"><span class="avatar avatar-sm">A</span> alice</span></td>
+              <td class="num">42</td>
+              <td class="num">25</td>
+              <td class="num">1512</td>
+            </tr>
+            <tr>
+              <td><span class="row"><span class="avatar avatar-sm">B</span> bob</span></td>
+              <td class="num">38</td>
+              <td class="num">19</td>
+              <td class="num">1480</td>
+            </tr>
+            <tr>
+              <td><span class="row"><span class="avatar avatar-sm">C</span> carol</span></td>
+              <td class="num">12</td>
+              <td class="num">5</td>
+              <td class="num">1390</td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <nav aria-label="Страницы">
+      <ul class="pagination">
+        <li><a class="page-link is-disabled" href="#data" aria-disabled="true" aria-label="Назад">‹</a></li>
+        <li><a class="page-link is-active" href="#data" aria-current="page">1</a></li>
+        <li><a class="page-link" href="#data">2</a></li>
+        <li><a class="page-link" href="#data">3</a></li>
+        <li><a class="page-link" href="#data" aria-label="Вперёд">›</a></li>
+      </ul>
+    </nav>
+  </section>
+
+  <section class="guide-section" id="icons">
+    <h2>Иконки</h2>
+    <p class="muted"><code>&lt;span class="icon icon-flag"&gt;&lt;/span&gt;</code>: цвет берётся из текста, размер из шрифта. Набор небольшой и собран только из того, что нужно сайту.</p>
+    <div class="icon-grid">
+        <div class="icon-cell">
+          <span class="icon icon-x" aria-hidden="true"></span>
+          <code>x</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-check" aria-hidden="true"></span>
+          <code>check</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-menu" aria-hidden="true"></span>
+          <code>menu</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-plus" aria-hidden="true"></span>
+          <code>plus</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-flag" aria-hidden="true"></span>
+          <code>flag</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-equal" aria-hidden="true"></span>
+          <code>equal</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-swap" aria-hidden="true"></span>
+          <code>swap</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-refresh" aria-hidden="true"></span>
+          <code>refresh</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-dice" aria-hidden="true"></span>
+          <code>dice</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-user" aria-hidden="true"></span>
+          <code>user</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-contrast" aria-hidden="true"></span>
+          <code>contrast</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-arrow" aria-hidden="true"></span>
+          <code>arrow</code>
+        </div>
+        <div class="icon-cell">
+          <span class="icon icon-search" aria-hidden="true"></span>
+          <code>search</code>
+        </div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="states">
+    <h2>Состояния</h2>
+    <p class="muted"><code>.spinner</code> и <code>.waiting</code> для ожидания, <code>.skeleton</code> для загрузки списков, <code>.empty</code> для пустых экранов.</p>
+    <div class="guide-grid guide-grid-wide">
+      <div class="guide-stack">
+        <div class="waiting"><span class="spinner" aria-hidden="true"></span> Ищем соперника…</div>
+        <div class="row"><span class="spinner" aria-hidden="true"></span><span class="muted">Загрузка</span></div>
+      </div>
+
+      <div class="card guide-stack" aria-busy="true">
+        <div class="row">
+          <span class="skeleton skeleton-avatar"></span>
+          <span class="skeleton skeleton-title"></span>
+        </div>
+        <span class="skeleton skeleton-line"></span>
+        <span class="skeleton skeleton-line"></span>
+      </div>
+
+      <div class="empty">
+        <span class="icon icon-dice" aria-hidden="true"></span>
+        <h3 class="empty-title">Пока нет партий</h3>
+        <p>Создайте первую партию или дождитесь соперника в лобби.</p>
+        <button class="btn btn-primary" type="button"><span class="icon icon-plus" aria-hidden="true"></span> Новая партия</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="menu">
+    <h2>Меню и подсказки</h2>
+    <p class="muted">Меню собрано на <code>&lt;details&gt;</code> и работает без скриптов. Список выпадает от левого края кнопки, для кнопки у правого края добавьте <code>.menu-end</code>. Подсказка берётся из <code>data-tooltip</code>, положение задаёт <code>data-tooltip-pos="bottom"</code>, для кнопки у правого края добавьте <code>data-tooltip-align="end"</code>.</p>
+    <div class="guide-menu">
+      <details class="menu" open>
+        <summary class="btn btn-ghost"><span class="icon icon-menu" aria-hidden="true"></span> Действия</summary>
+        <ul class="menu-list">
+          <li><button class="menu-item" type="button"><span class="icon icon-swap" aria-hidden="true"></span> Перевернуть доску</button></li>
+          <li><button class="menu-item" type="button"><span class="icon icon-equal" aria-hidden="true"></span> Предложить ничью</button></li>
+          <li class="menu-divider" role="separator"></li>
+          <li><button class="menu-item is-danger" type="button"><span class="icon icon-flag" aria-hidden="true"></span> Сдаться</button></li>
+        </ul>
+      </details>
+    </div>
+    <div class="row">
+      <button class="btn btn-ghost" type="button" data-tooltip="Подсказка сверху">Наведите курсор</button>
+      <button class="btn btn-ghost" type="button" data-tooltip="Подсказка снизу" data-tooltip-pos="bottom">Или сюда</button>
+    </div>
+  </section>
+
+  <section class="guide-section" id="board">
+    <h2>Доска</h2>
+    <p class="muted">
+      Размер задаётся шириной контейнера (<code>--board-max</code>), фигуры и подписи масштабируются вместе с ней.
+      Состояния клетки: <code>.is-selected</code>, <code>.is-target</code>, <code>.is-capture</code>, <code>.is-last-move</code>, <code>.is-check</code>.
+      Для взаимодействия: <code>.is-clickable</code> (курсор и подсветка при наведении), <code>.is-drop</code> (куда можно бросить фигуру), на фигуре <code>.is-draggable</code> и <code>.is-dragging</code>.
+      Клетка получает <code>data-tone</code>, <code>data-file</code> и <code>data-rank</code> от разметки, поэтому доску можно отрисовать из ERB или из JS.
+    </p>
+    <div class="guide-grid guide-grid-wide">
+      <div class="guide-board">
+<div class="board" role="group" aria-label="Шахматная доска">
+    <div class="square" data-square="a8" data-tone="light" data-rank="8">
+        <span class="piece" data-piece="br" role="img" aria-label="Чёрная ладья"></span>
+</div>    <div class="square" data-square="b8" data-tone="dark"></div>    <div class="square" data-square="c8" data-tone="light">
+        <span class="piece" data-piece="bb" role="img" aria-label="Чёрный слон"></span>
+</div>    <div class="square" data-square="d8" data-tone="dark">
+        <span class="piece" data-piece="bq" role="img" aria-label="Чёрный ферзь"></span>
+</div>    <div class="square" data-square="e8" data-tone="light">
+        <span class="piece" data-piece="bk" role="img" aria-label="Чёрный король"></span>
+</div>    <div class="square is-last-move" data-square="f8" data-tone="dark"></div>    <div class="square" data-square="g8" data-tone="light">
+        <span class="piece" data-piece="bn" role="img" aria-label="Чёрный конь"></span>
+</div>    <div class="square" data-square="h8" data-tone="dark">
+        <span class="piece" data-piece="br" role="img" aria-label="Чёрная ладья"></span>
+</div>    <div class="square" data-square="a7" data-tone="dark" data-rank="7">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="b7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="c7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="d7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="e7" data-tone="dark"></div>    <div class="square" data-square="f7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="g7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="h7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="a6" data-tone="light" data-rank="6"></div>    <div class="square" data-square="b6" data-tone="dark"></div>    <div class="square" data-square="c6" data-tone="light">
+        <span class="piece" data-piece="bn" role="img" aria-label="Чёрный конь"></span>
+</div>    <div class="square" data-square="d6" data-tone="dark"></div>    <div class="square" data-square="e6" data-tone="light"></div>    <div class="square" data-square="f6" data-tone="dark"></div>    <div class="square" data-square="g6" data-tone="light"></div>    <div class="square" data-square="h6" data-tone="dark"></div>    <div class="square" data-square="a5" data-tone="dark" data-rank="5"></div>    <div class="square" data-square="b5" data-tone="light"></div>    <div class="square is-last-move" data-square="c5" data-tone="dark">
+        <span class="piece" data-piece="bb" role="img" aria-label="Чёрный слон"></span>
+</div>    <div class="square" data-square="d5" data-tone="light"></div>    <div class="square is-capture" data-square="e5" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="f5" data-tone="light"></div>    <div class="square is-target" data-square="g5" data-tone="dark"></div>    <div class="square" data-square="h5" data-tone="light"></div>    <div class="square" data-square="a4" data-tone="light" data-rank="4"></div>    <div class="square" data-square="b4" data-tone="dark"></div>    <div class="square" data-square="c4" data-tone="light">
+        <span class="piece" data-piece="wb" role="img" aria-label="Белый слон"></span>
+</div>    <div class="square is-target" data-square="d4" data-tone="dark"></div>    <div class="square" data-square="e4" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="f4" data-tone="dark"></div>    <div class="square" data-square="g4" data-tone="light"></div>    <div class="square is-target" data-square="h4" data-tone="dark"></div>    <div class="square" data-square="a3" data-tone="dark" data-rank="3"></div>    <div class="square" data-square="b3" data-tone="light"></div>    <div class="square" data-square="c3" data-tone="dark"></div>    <div class="square" data-square="d3" data-tone="light"></div>    <div class="square" data-square="e3" data-tone="dark"></div>    <div class="square is-selected" data-square="f3" data-tone="light">
+        <span class="piece" data-piece="wn" role="img" aria-label="Белый конь"></span>
+</div>    <div class="square" data-square="g3" data-tone="dark"></div>    <div class="square" data-square="h3" data-tone="light"></div>    <div class="square" data-square="a2" data-tone="light" data-rank="2">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="b2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="c2" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="d2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="e2" data-tone="light"></div>    <div class="square" data-square="f2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="g2" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="h2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="a1" data-tone="dark" data-file="a" data-rank="1">
+        <span class="piece" data-piece="wr" role="img" aria-label="Белая ладья"></span>
+</div>    <div class="square" data-square="b1" data-tone="light" data-file="b">
+        <span class="piece" data-piece="wn" role="img" aria-label="Белый конь"></span>
+</div>    <div class="square" data-square="c1" data-tone="dark" data-file="c">
+        <span class="piece" data-piece="wb" role="img" aria-label="Белый слон"></span>
+</div>    <div class="square" data-square="d1" data-tone="light" data-file="d">
+        <span class="piece" data-piece="wq" role="img" aria-label="Белый ферзь"></span>
+</div>    <div class="square" data-square="e1" data-tone="dark" data-file="e">
+        <span class="piece" data-piece="wk" role="img" aria-label="Белый король"></span>
+</div>    <div class="square" data-square="f1" data-tone="light" data-file="f"></div>    <div class="square is-target" data-square="g1" data-tone="dark" data-file="g"></div>    <div class="square" data-square="h1" data-tone="light" data-file="h">
+        <span class="piece" data-piece="wr" role="img" aria-label="Белая ладья"></span>
+</div></div>
+</div>
+      <div class="guide-board">
+<div class="board" role="group" aria-label="Шахматная доска">
+    <div class="square" data-square="h1" data-tone="light" data-rank="1">
+        <span class="piece" data-piece="wr" role="img" aria-label="Белая ладья"></span>
+</div>    <div class="square" data-square="g1" data-tone="dark">
+        <span class="piece" data-piece="wn" role="img" aria-label="Белый конь"></span>
+</div>    <div class="square" data-square="f1" data-tone="light">
+        <span class="piece" data-piece="wb" role="img" aria-label="Белый слон"></span>
+</div>    <div class="square is-check" data-square="e1" data-tone="dark">
+        <span class="piece" data-piece="wk" role="img" aria-label="Белый король"></span>
+</div>    <div class="square" data-square="d1" data-tone="light">
+        <span class="piece" data-piece="wq" role="img" aria-label="Белый ферзь"></span>
+</div>    <div class="square" data-square="c1" data-tone="dark">
+        <span class="piece" data-piece="wb" role="img" aria-label="Белый слон"></span>
+</div>    <div class="square" data-square="b1" data-tone="light">
+        <span class="piece" data-piece="wn" role="img" aria-label="Белый конь"></span>
+</div>    <div class="square" data-square="a1" data-tone="dark">
+        <span class="piece" data-piece="wr" role="img" aria-label="Белая ладья"></span>
+</div>    <div class="square" data-square="h2" data-tone="dark" data-rank="2">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="g2" data-tone="light"></div>    <div class="square" data-square="f2" data-tone="dark"></div>    <div class="square" data-square="e2" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="d2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="c2" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="b2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="a2" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="h3" data-tone="light" data-rank="3"></div>    <div class="square" data-square="g3" data-tone="dark"></div>    <div class="square" data-square="f3" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="e3" data-tone="dark"></div>    <div class="square" data-square="d3" data-tone="light"></div>    <div class="square" data-square="c3" data-tone="dark"></div>    <div class="square" data-square="b3" data-tone="light"></div>    <div class="square" data-square="a3" data-tone="dark"></div>    <div class="square is-last-move" data-square="h4" data-tone="dark" data-rank="4">
+        <span class="piece" data-piece="bq" role="img" aria-label="Чёрный ферзь"></span>
+</div>    <div class="square" data-square="g4" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="f4" data-tone="dark"></div>    <div class="square" data-square="e4" data-tone="light"></div>    <div class="square" data-square="d4" data-tone="dark"></div>    <div class="square" data-square="c4" data-tone="light"></div>    <div class="square" data-square="b4" data-tone="dark"></div>    <div class="square" data-square="a4" data-tone="light"></div>    <div class="square" data-square="h5" data-tone="light" data-rank="5"></div>    <div class="square" data-square="g5" data-tone="dark"></div>    <div class="square" data-square="f5" data-tone="light"></div>    <div class="square" data-square="e5" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="d5" data-tone="light"></div>    <div class="square" data-square="c5" data-tone="dark"></div>    <div class="square" data-square="b5" data-tone="light"></div>    <div class="square" data-square="a5" data-tone="dark"></div>    <div class="square" data-square="h6" data-tone="dark" data-rank="6"></div>    <div class="square" data-square="g6" data-tone="light"></div>    <div class="square" data-square="f6" data-tone="dark"></div>    <div class="square" data-square="e6" data-tone="light"></div>    <div class="square" data-square="d6" data-tone="dark"></div>    <div class="square" data-square="c6" data-tone="light"></div>    <div class="square" data-square="b6" data-tone="dark"></div>    <div class="square" data-square="a6" data-tone="light"></div>    <div class="square" data-square="h7" data-tone="light" data-rank="7">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="g7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="f7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="e7" data-tone="dark"></div>    <div class="square" data-square="d7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="c7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="b7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="a7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="h8" data-tone="dark" data-file="h" data-rank="8">
+        <span class="piece" data-piece="br" role="img" aria-label="Чёрная ладья"></span>
+</div>    <div class="square" data-square="g8" data-tone="light" data-file="g">
+        <span class="piece" data-piece="bn" role="img" aria-label="Чёрный конь"></span>
+</div>    <div class="square" data-square="f8" data-tone="dark" data-file="f">
+        <span class="piece" data-piece="bb" role="img" aria-label="Чёрный слон"></span>
+</div>    <div class="square" data-square="e8" data-tone="light" data-file="e">
+        <span class="piece" data-piece="bk" role="img" aria-label="Чёрный король"></span>
+</div>    <div class="square is-last-move" data-square="d8" data-tone="dark" data-file="d"></div>    <div class="square" data-square="c8" data-tone="light" data-file="c">
+        <span class="piece" data-piece="bb" role="img" aria-label="Чёрный слон"></span>
+</div>    <div class="square" data-square="b8" data-tone="dark" data-file="b">
+        <span class="piece" data-piece="bn" role="img" aria-label="Чёрный конь"></span>
+</div>    <div class="square" data-square="a8" data-tone="light" data-file="a">
+        <span class="piece" data-piece="br" role="img" aria-label="Чёрная ладья"></span>
+</div></div>
+</div>
+      <div class="guide-board">
+<div class="board" role="group" aria-label="Шахматная доска">
+    <div class="square" data-square="a8" data-tone="light" data-rank="8">
+        <span class="piece" data-piece="br" role="img" aria-label="Чёрная ладья"></span>
+</div>    <div class="square" data-square="b8" data-tone="dark">
+        <span class="piece" data-piece="bn" role="img" aria-label="Чёрный конь"></span>
+</div>    <div class="square" data-square="c8" data-tone="light">
+        <span class="piece" data-piece="bb" role="img" aria-label="Чёрный слон"></span>
+</div>    <div class="square" data-square="d8" data-tone="dark">
+        <span class="piece" data-piece="bq" role="img" aria-label="Чёрный ферзь"></span>
+</div>    <div class="square" data-square="e8" data-tone="light">
+        <span class="piece" data-piece="bk" role="img" aria-label="Чёрный король"></span>
+</div>    <div class="square" data-square="f8" data-tone="dark">
+        <span class="piece" data-piece="bb" role="img" aria-label="Чёрный слон"></span>
+</div>    <div class="square" data-square="g8" data-tone="light">
+        <span class="piece" data-piece="bn" role="img" aria-label="Чёрный конь"></span>
+</div>    <div class="square" data-square="h8" data-tone="dark">
+        <span class="piece" data-piece="br" role="img" aria-label="Чёрная ладья"></span>
+</div>    <div class="square" data-square="a7" data-tone="dark" data-rank="7">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="b7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="c7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="d7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="e7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="f7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="g7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="h7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="a6" data-tone="light" data-rank="6"></div>    <div class="square" data-square="b6" data-tone="dark"></div>    <div class="square" data-square="c6" data-tone="light"></div>    <div class="square" data-square="d6" data-tone="dark"></div>    <div class="square" data-square="e6" data-tone="light"></div>    <div class="square" data-square="f6" data-tone="dark"></div>    <div class="square" data-square="g6" data-tone="light"></div>    <div class="square" data-square="h6" data-tone="dark"></div>    <div class="square" data-square="a5" data-tone="dark" data-rank="5"></div>    <div class="square" data-square="b5" data-tone="light"></div>    <div class="square" data-square="c5" data-tone="dark"></div>    <div class="square" data-square="d5" data-tone="light"></div>    <div class="square" data-square="e5" data-tone="dark"></div>    <div class="square" data-square="f5" data-tone="light"></div>    <div class="square" data-square="g5" data-tone="dark"></div>    <div class="square" data-square="h5" data-tone="light"></div>    <div class="square" data-square="a4" data-tone="light" data-rank="4"></div>    <div class="square" data-square="b4" data-tone="dark"></div>    <div class="square" data-square="c4" data-tone="light"></div>    <div class="square" data-square="d4" data-tone="dark"></div>    <div class="square is-target is-drop is-clickable" data-square="e4" data-tone="light"></div>    <div class="square" data-square="f4" data-tone="dark"></div>    <div class="square" data-square="g4" data-tone="light"></div>    <div class="square" data-square="h4" data-tone="dark"></div>    <div class="square" data-square="a3" data-tone="dark" data-rank="3"></div>    <div class="square" data-square="b3" data-tone="light"></div>    <div class="square" data-square="c3" data-tone="dark"></div>    <div class="square" data-square="d3" data-tone="light"></div>    <div class="square is-target is-clickable" data-square="e3" data-tone="dark"></div>    <div class="square" data-square="f3" data-tone="light"></div>    <div class="square" data-square="g3" data-tone="dark"></div>    <div class="square" data-square="h3" data-tone="light"></div>    <div class="square" data-square="a2" data-tone="light" data-rank="2">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="b2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="c2" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="d2" data-tone="dark">
+        <span class="piece is-draggable" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square is-selected" data-square="e2" data-tone="light">
+        <span class="piece is-dragging" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="f2" data-tone="dark">
+        <span class="piece is-draggable" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="g2" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="h2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="a1" data-tone="dark" data-file="a" data-rank="1">
+        <span class="piece" data-piece="wr" role="img" aria-label="Белая ладья"></span>
+</div>    <div class="square" data-square="b1" data-tone="light" data-file="b">
+        <span class="piece" data-piece="wn" role="img" aria-label="Белый конь"></span>
+</div>    <div class="square" data-square="c1" data-tone="dark" data-file="c">
+        <span class="piece" data-piece="wb" role="img" aria-label="Белый слон"></span>
+</div>    <div class="square" data-square="d1" data-tone="light" data-file="d">
+        <span class="piece" data-piece="wq" role="img" aria-label="Белый ферзь"></span>
+</div>    <div class="square" data-square="e1" data-tone="dark" data-file="e">
+        <span class="piece" data-piece="wk" role="img" aria-label="Белый король"></span>
+</div>    <div class="square" data-square="f1" data-tone="light" data-file="f">
+        <span class="piece" data-piece="wb" role="img" aria-label="Белый слон"></span>
+</div>    <div class="square" data-square="g1" data-tone="dark" data-file="g">
+        <span class="piece" data-piece="wn" role="img" aria-label="Белый конь"></span>
+</div>    <div class="square" data-square="h1" data-tone="light" data-file="h">
+        <span class="piece" data-piece="wr" role="img" aria-label="Белая ладья"></span>
+</div></div>
+</div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="pieces">
+    <h2>Фигуры</h2>
+    <p class="muted"><code>.piece</code> на доске и <code>.piece-icon</code> в тексте; код фигуры в <code>data-piece</code>: цвет <code>w</code>/<code>b</code> и тип <code>k q r b n p</code>.</p>
+      <div class="pieces-grid">
+          <div class="piece-sample">
+            <span class="piece" data-piece="wk" role="img" aria-label="Белый король"></span>
+</div>          <div class="piece-sample is-dark">
+            <span class="piece" data-piece="wq" role="img" aria-label="Белый ферзь"></span>
+</div>          <div class="piece-sample">
+            <span class="piece" data-piece="wr" role="img" aria-label="Белая ладья"></span>
+</div>          <div class="piece-sample is-dark">
+            <span class="piece" data-piece="wb" role="img" aria-label="Белый слон"></span>
+</div>          <div class="piece-sample">
+            <span class="piece" data-piece="wn" role="img" aria-label="Белый конь"></span>
+</div>          <div class="piece-sample is-dark">
+            <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>      </div>
+      <div class="pieces-grid">
+          <div class="piece-sample">
+            <span class="piece" data-piece="bk" role="img" aria-label="Чёрный король"></span>
+</div>          <div class="piece-sample is-dark">
+            <span class="piece" data-piece="bq" role="img" aria-label="Чёрный ферзь"></span>
+</div>          <div class="piece-sample">
+            <span class="piece" data-piece="br" role="img" aria-label="Чёрная ладья"></span>
+</div>          <div class="piece-sample is-dark">
+            <span class="piece" data-piece="bb" role="img" aria-label="Чёрный слон"></span>
+</div>          <div class="piece-sample">
+            <span class="piece" data-piece="bn" role="img" aria-label="Чёрный конь"></span>
+</div>          <div class="piece-sample is-dark">
+            <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>      </div>
+    <p>
+      В тексте:
+        <span class="piece-icon" data-piece="wk"></span>
+        <span class="piece-icon" data-piece="wq"></span>
+        <span class="piece-icon" data-piece="wr"></span>
+        <span class="piece-icon" data-piece="wb"></span>
+        <span class="piece-icon" data-piece="wn"></span>
+        <span class="piece-icon" data-piece="wp"></span>
+        <span class="piece-icon" data-piece="bk"></span>
+        <span class="piece-icon" data-piece="bq"></span>
+        <span class="piece-icon" data-piece="br"></span>
+        <span class="piece-icon" data-piece="bb"></span>
+        <span class="piece-icon" data-piece="bn"></span>
+        <span class="piece-icon" data-piece="bp"></span>
+    </p>
+  </section>
+
+  <section class="guide-section" id="dice">
+    <h2>Кубики</h2>
+    <p class="muted">
+      Игрок бросает два кубика и выбирает, значением какого из них ходить. Грани рисуются стилями по <code>data-value</code> от 1 до 6, размер меняется через <code>--die-size</code>.
+      Состояния: <code>.is-selected</code> выбран, <code>.is-blocked</code> и <code>disabled</code> нет допустимых ходов, <code>.is-rolling</code> бросок.
+    </p>
+
+    <h3>Лоток с кубиками</h3>
+    <div class="dice-tray">
+      
+<div class="die-slot">
+  <button type="button" class="die is-selected" data-value="2" aria-pressed="true" aria-label="Кубик: 2"></button>
+
+    <span class="die-caption">
+      <span class="piece-icon" data-piece="wn"></span>
+      Белый конь
+    </span>
+</div>
+
+      
+<div class="die-slot">
+  <button type="button" class="die" data-value="5" aria-pressed="false" aria-label="Кубик: 5"></button>
+
+    <span class="die-caption">
+      <span class="piece-icon" data-piece="wq"></span>
+      Белый ферзь
+    </span>
+</div>
+
+    </div>
+
+    <h3>Грани и состояния</h3>
+    <div class="row">
+        
+<div class="die-slot">
+  <button type="button" class="die" data-value="1" aria-pressed="false" aria-label="Кубик: 1"></button>
+
+</div>
+
+        
+<div class="die-slot">
+  <button type="button" class="die" data-value="2" aria-pressed="false" aria-label="Кубик: 2"></button>
+
+</div>
+
+        
+<div class="die-slot">
+  <button type="button" class="die" data-value="3" aria-pressed="false" aria-label="Кубик: 3"></button>
+
+</div>
+
+        
+<div class="die-slot">
+  <button type="button" class="die" data-value="4" aria-pressed="false" aria-label="Кубик: 4"></button>
+
+</div>
+
+        
+<div class="die-slot">
+  <button type="button" class="die" data-value="5" aria-pressed="false" aria-label="Кубик: 5"></button>
+
+</div>
+
+        
+<div class="die-slot">
+  <button type="button" class="die" data-value="6" aria-pressed="false" aria-label="Кубик: 6"></button>
+
+</div>
+
+    </div>
+    <div class="row">
+      
+<div class="die-slot">
+  <button type="button" class="die" data-value="4" aria-pressed="false" aria-label="Кубик: 4"></button>
+
+</div>
+
+      
+<div class="die-slot">
+  <button type="button" class="die is-selected" data-value="4" aria-pressed="true" aria-label="Кубик: 4"></button>
+
+</div>
+
+      
+<div class="die-slot">
+  <button type="button" class="die is-blocked" data-value="4" disabled="disabled" aria-pressed="false" aria-label="Кубик: 4"></button>
+
+</div>
+
+      
+<div class="die-slot">
+  <button type="button" class="die is-rolling" data-value="4" aria-pressed="false" aria-label="Кубик: 4"></button>
+
+</div>
+
+    </div>
+  </section>
+
+  <section class="guide-section" id="players">
+    <h2>Игроки, часы и ходы</h2>
+    <div class="guide-grid guide-grid-wide">
+      <div class="guide-stack">
+        <section class="player-panel">
+  <span class="avatar">B</span>
+
+  <div class="player-info">
+    <span class="player-name">bob</span>
+    <span class="player-meta">Рейтинг 1480</span>
+  </div>
+
+    <div class="captured">
+        <span class="piece-icon" data-piece="wp" aria-label="Белая пешка"></span>
+        <span class="piece-icon" data-piece="wn" aria-label="Белый конь"></span>
+    </div>
+
+  <div class="clock">09:42</div>
+</section>
+        <section class="player-panel is-active">
+  <span class="avatar">A</span>
+
+  <div class="player-info">
+    <span class="player-name">alice</span>
+    <span class="player-meta">Рейтинг 1512</span>
+  </div>
+
+
+  <div class="clock is-running">08:15</div>
+</section>
+        <section class="player-panel is-active">
+  <span class="avatar">C</span>
+
+  <div class="player-info">
+    <span class="player-name">carol</span>
+    <span class="player-meta">Рейтинг 1390</span>
+  </div>
+
+
+  <div class="clock is-running is-low">00:09</div>
+</section>
+      </div>
+      <section class="moves-panel">
+  <h3 class="moves-title">Ходы</h3>
+
+  <ol class="move-list">
+      <li class="move-row">
+        <span class="move-no">1.</span>
+          <span class="move">
+            <span class="die die-sm" data-value="1" aria-label="Кубик: 1"></span>
+            e4
+</span>          <span class="move">
+            <span class="die die-sm" data-value="1" aria-label="Кубик: 1"></span>
+            e5
+</span>      </li>
+      <li class="move-row">
+        <span class="move-no">2.</span>
+          <span class="move">
+            <span class="die die-sm" data-value="2" aria-label="Кубик: 2"></span>
+            Nf3
+</span>          <span class="move">
+            <span class="die die-sm" data-value="2" aria-label="Кубик: 2"></span>
+            Nc6
+</span>      </li>
+      <li class="move-row">
+        <span class="move-no">3.</span>
+          <span class="move">
+            <span class="die die-sm" data-value="3" aria-label="Кубик: 3"></span>
+            Bc4
+</span>          <span class="move is-current">
+            <span class="die die-sm" data-value="3" aria-label="Кубик: 3"></span>
+            Bc5
+</span>      </li>
+  </ol>
+</section>
+
+    </div>
+  </section>
+
+  <section class="guide-section" id="dialogs">
+    <h2>Диалоги партии</h2>
+    <p class="muted">Превращение пешки и окно результата. На сайте их открывает <code>dialog.showModal()</code>, здесь они показаны открытыми.</p>
+    <div class="guide-grid guide-grid-wide">
+      <div class="guide-dialog">
+<dialog class="dialog" open="open" aria-labelledby="promotion-title">
+  <h3 class="dialog-title" id="promotion-title">Превращение пешки</h3>
+  <p class="muted">Выберите фигуру, в которую превратится пешка.</p>
+
+  <div class="promotion">
+      <button type="button" class="promotion-choice" aria-label="Белый ферзь">
+        <span class="piece-icon" data-piece="wq"></span>
+</button>      <button type="button" class="promotion-choice" aria-label="Белая ладья">
+        <span class="piece-icon" data-piece="wr"></span>
+</button>      <button type="button" class="promotion-choice" aria-label="Белый слон">
+        <span class="piece-icon" data-piece="wb"></span>
+</button>      <button type="button" class="promotion-choice" aria-label="Белый конь">
+        <span class="piece-icon" data-piece="wn"></span>
+</button>  </div>
+</dialog></div>
+      <div class="guide-dialog">
+<dialog class="dialog" open="open" aria-labelledby="result-title-win">
+  <div class="result result-win">
+    <h3 class="result-title" id="result-title-win">Победа</h3>
+    <p class="result-reason">Мат в 23 хода</p>
+    <span class="badge badge-success">Рейтинг +12</span>
+</div>
+  <div class="dialog-actions">
+    <button class="btn btn-ghost" type="button">В лобби</button>
+    <button class="btn btn-primary" type="button"><span class="icon icon-refresh" aria-hidden="true"></span> Реванш</button>
+  </div>
+</dialog></div>
+      <div class="guide-dialog">
+<dialog class="dialog" open="open" aria-labelledby="result-title-loss">
+  <div class="result result-loss">
+    <h3 class="result-title" id="result-title-loss">Поражение</h3>
+    <p class="result-reason">Истекло время</p>
+    <span class="badge badge-error">Рейтинг −9</span>
+</div>
+  <div class="dialog-actions">
+    <button class="btn btn-ghost" type="button">В лобби</button>
+    <button class="btn btn-primary" type="button"><span class="icon icon-refresh" aria-hidden="true"></span> Реванш</button>
+  </div>
+</dialog></div>
+      <div class="guide-dialog">
+<dialog class="dialog" open="open" aria-labelledby="result-title-draw">
+  <div class="result result-draw">
+    <h3 class="result-title" id="result-title-draw">Ничья</h3>
+    <p class="result-reason">Пат</p>
+    <span class="badge badge-warning">Рейтинг +1</span>
+</div>
+  <div class="dialog-actions">
+    <button class="btn btn-ghost" type="button">В лобби</button>
+    <button class="btn btn-primary" type="button"><span class="icon icon-refresh" aria-hidden="true"></span> Реванш</button>
+  </div>
+</dialog></div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="gameforms">
+    <h2>Формы партии</h2>
+    <p class="muted">Формы основного функционала: создание партии (выбор цвета карточками, контроль времени, переключатель рейтинга), чат со свободным вводом и заметка к партии.</p>
+    <div class="guide-grid guide-grid-wide">
+      
+<form class="card" action="#" method="get">
+  <h3 class="card-title">Новая партия</h3>
+
+  <fieldset class="fieldset">
+    <legend class="legend">Играть за</legend>
+    <div class="choice-group">
+      <label class="choice">
+        <input type="radio" name="color" value="white" checked>
+        <span class="choice-body"><span class="piece-icon" data-piece="wk"></span> Белых</span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="color" value="black">
+        <span class="choice-body"><span class="piece-icon" data-piece="bk"></span> Чёрных</span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="color" value="random">
+        <span class="choice-body"><span class="icon icon-dice" aria-hidden="true"></span> Случайно</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="field">
+    <label class="label" for="forms-control">Контроль времени</label>
+    <select class="input" id="forms-control" name="control">
+      <option>5 минут</option>
+      <option selected>10 минут</option>
+      <option>15 + 10</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label class="switch">
+      <input type="checkbox" name="rated" checked>
+      <span class="switch-track"></span>
+      Рейтинговая партия
+    </label>
+  </div>
+
+  <button class="btn btn-primary btn-block" type="submit">
+    <span class="icon icon-plus" aria-hidden="true"></span> Создать партию
+  </button>
+</form>
+
+
+      <div class="guide-stack">
+        
+<section class="chat" aria-label="Чат партии">
+  <ul class="chat-log">
+      <li class="chat-message">
+        <span class="chat-author">bob</span>
+        Привет! Играем?
+</li>      <li class="chat-message is-own">
+        <span class="chat-author">alice</span>
+        Да, 10 минут
+</li>      <li class="chat-message">
+        <span class="chat-author">bob</span>
+        Удачи, бросаю кубики
+</li>  </ul>
+
+  <form class="chat-form" action="#" method="get">
+    <label class="sr-only" for="forms-chat-message">Сообщение</label>
+    <input class="input" id="forms-chat-message" name="message" placeholder="Напишите сообщение">
+    <button class="btn btn-primary btn-icon" type="submit" aria-label="Отправить">
+      <span class="icon icon-arrow" aria-hidden="true"></span>
+    </button>
+  </form>
+</section>
+
+
+        <form class="card" action="#" method="get">
+          <h3 class="card-title">Заметка к партии</h3>
+          <div class="field">
+            <label class="label" for="forms-note">Комментарий</label>
+            <textarea class="input" id="forms-note" name="note" rows="3" maxlength="500" placeholder="Что пошло не так, что запомнить"></textarea>
+            <p class="field-hint">До 500 символов.</p>
+          </div>
+          <button class="btn btn-secondary" type="submit">Сохранить заметку</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section" id="lobby">
+    <h2>Карточки партий</h2>
+    <div class="game-list">
+        <article class="game-card">
+  <div class="game-card-players">
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="wk" aria-label="Белые"></span>
+        <span class="avatar avatar-sm">A</span>
+        <span>alice</span>
+        <span class="muted">1512</span>
+      </div>
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="bk" aria-label="Чёрные"></span>
+        <span class="avatar avatar-sm">B</span>
+        <span>bob</span>
+        <span class="muted">1480</span>
+      </div>
+  </div>
+
+  <div class="game-card-meta">
+    <span class="badge">10 минут</span>
+    <span class="badge badge-accent">Два кубика</span>
+  </div>
+
+  <button type="button" class="btn btn-primary btn-sm">Играть</button>
+</article>
+
+        <article class="game-card">
+  <div class="game-card-players">
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="wk" aria-label="Белые"></span>
+        <span class="avatar avatar-sm">C</span>
+        <span>carol</span>
+        <span class="muted">1390</span>
+      </div>
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="bk" aria-label="Чёрные"></span>
+        <span class="avatar avatar-sm">D</span>
+        <span>dave</span>
+        <span class="muted">1405</span>
+      </div>
+  </div>
+
+  <div class="game-card-meta">
+    <span class="badge">5 минут</span>
+    <span class="badge badge-accent">Два кубика</span>
+  </div>
+
+  <button type="button" class="btn btn-primary btn-sm">Смотреть</button>
+</article>
+
+        <article class="game-card">
+  <div class="game-card-players">
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="wk" aria-label="Белые"></span>
+        <span class="avatar avatar-sm">E</span>
+        <span>erin</span>
+        <span class="muted">1620</span>
+      </div>
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="bk" aria-label="Чёрные"></span>
+        <span class="avatar avatar-sm">F</span>
+        <span>frank</span>
+        <span class="muted">1588</span>
+      </div>
+  </div>
+
+  <div class="game-card-meta">
+    <span class="badge">15 + 10</span>
+    <span class="badge badge-accent">Два кубика</span>
+  </div>
+
+  <button type="button" class="btn btn-primary btn-sm">Смотреть</button>
+</article>
+
+    </div>
+  </section>
+
+  <section class="guide-section" id="game">
+    <h2>Партия целиком</h2>
+    <div class="game">
+      <div class="game-main">
+        <section class="player-panel">
+  <span class="avatar">B</span>
+
+  <div class="player-info">
+    <span class="player-name">bob</span>
+    <span class="player-meta">Рейтинг 1480</span>
+  </div>
+
+
+  <div class="clock">09:42</div>
+</section>
+        
+<div class="board" role="group" aria-label="Шахматная доска">
+    <div class="square" data-square="a8" data-tone="light" data-rank="8">
+        <span class="piece" data-piece="br" role="img" aria-label="Чёрная ладья"></span>
+</div>    <div class="square" data-square="b8" data-tone="dark"></div>    <div class="square" data-square="c8" data-tone="light">
+        <span class="piece" data-piece="bb" role="img" aria-label="Чёрный слон"></span>
+</div>    <div class="square" data-square="d8" data-tone="dark">
+        <span class="piece" data-piece="bq" role="img" aria-label="Чёрный ферзь"></span>
+</div>    <div class="square" data-square="e8" data-tone="light">
+        <span class="piece" data-piece="bk" role="img" aria-label="Чёрный король"></span>
+</div>    <div class="square is-last-move" data-square="f8" data-tone="dark"></div>    <div class="square" data-square="g8" data-tone="light">
+        <span class="piece" data-piece="bn" role="img" aria-label="Чёрный конь"></span>
+</div>    <div class="square" data-square="h8" data-tone="dark">
+        <span class="piece" data-piece="br" role="img" aria-label="Чёрная ладья"></span>
+</div>    <div class="square" data-square="a7" data-tone="dark" data-rank="7">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="b7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="c7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="d7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="e7" data-tone="dark"></div>    <div class="square" data-square="f7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="g7" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="h7" data-tone="light">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="a6" data-tone="light" data-rank="6"></div>    <div class="square" data-square="b6" data-tone="dark"></div>    <div class="square" data-square="c6" data-tone="light">
+        <span class="piece" data-piece="bn" role="img" aria-label="Чёрный конь"></span>
+</div>    <div class="square" data-square="d6" data-tone="dark"></div>    <div class="square" data-square="e6" data-tone="light"></div>    <div class="square" data-square="f6" data-tone="dark"></div>    <div class="square" data-square="g6" data-tone="light"></div>    <div class="square" data-square="h6" data-tone="dark"></div>    <div class="square" data-square="a5" data-tone="dark" data-rank="5"></div>    <div class="square" data-square="b5" data-tone="light"></div>    <div class="square is-last-move" data-square="c5" data-tone="dark">
+        <span class="piece" data-piece="bb" role="img" aria-label="Чёрный слон"></span>
+</div>    <div class="square" data-square="d5" data-tone="light"></div>    <div class="square is-capture" data-square="e5" data-tone="dark">
+        <span class="piece" data-piece="bp" role="img" aria-label="Чёрная пешка"></span>
+</div>    <div class="square" data-square="f5" data-tone="light"></div>    <div class="square is-target" data-square="g5" data-tone="dark"></div>    <div class="square" data-square="h5" data-tone="light"></div>    <div class="square" data-square="a4" data-tone="light" data-rank="4"></div>    <div class="square" data-square="b4" data-tone="dark"></div>    <div class="square" data-square="c4" data-tone="light">
+        <span class="piece" data-piece="wb" role="img" aria-label="Белый слон"></span>
+</div>    <div class="square is-target" data-square="d4" data-tone="dark"></div>    <div class="square" data-square="e4" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="f4" data-tone="dark"></div>    <div class="square" data-square="g4" data-tone="light"></div>    <div class="square is-target" data-square="h4" data-tone="dark"></div>    <div class="square" data-square="a3" data-tone="dark" data-rank="3"></div>    <div class="square" data-square="b3" data-tone="light"></div>    <div class="square" data-square="c3" data-tone="dark"></div>    <div class="square" data-square="d3" data-tone="light"></div>    <div class="square" data-square="e3" data-tone="dark"></div>    <div class="square is-selected" data-square="f3" data-tone="light">
+        <span class="piece" data-piece="wn" role="img" aria-label="Белый конь"></span>
+</div>    <div class="square" data-square="g3" data-tone="dark"></div>    <div class="square" data-square="h3" data-tone="light"></div>    <div class="square" data-square="a2" data-tone="light" data-rank="2">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="b2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="c2" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="d2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="e2" data-tone="light"></div>    <div class="square" data-square="f2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="g2" data-tone="light">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="h2" data-tone="dark">
+        <span class="piece" data-piece="wp" role="img" aria-label="Белая пешка"></span>
+</div>    <div class="square" data-square="a1" data-tone="dark" data-file="a" data-rank="1">
+        <span class="piece" data-piece="wr" role="img" aria-label="Белая ладья"></span>
+</div>    <div class="square" data-square="b1" data-tone="light" data-file="b">
+        <span class="piece" data-piece="wn" role="img" aria-label="Белый конь"></span>
+</div>    <div class="square" data-square="c1" data-tone="dark" data-file="c">
+        <span class="piece" data-piece="wb" role="img" aria-label="Белый слон"></span>
+</div>    <div class="square" data-square="d1" data-tone="light" data-file="d">
+        <span class="piece" data-piece="wq" role="img" aria-label="Белый ферзь"></span>
+</div>    <div class="square" data-square="e1" data-tone="dark" data-file="e">
+        <span class="piece" data-piece="wk" role="img" aria-label="Белый король"></span>
+</div>    <div class="square" data-square="f1" data-tone="light" data-file="f"></div>    <div class="square is-target" data-square="g1" data-tone="dark" data-file="g"></div>    <div class="square" data-square="h1" data-tone="light" data-file="h">
+        <span class="piece" data-piece="wr" role="img" aria-label="Белая ладья"></span>
+</div></div>
+
+        <section class="player-panel is-active">
+  <span class="avatar">A</span>
+
+  <div class="player-info">
+    <span class="player-name">alice</span>
+    <span class="player-meta">Рейтинг 1512</span>
+  </div>
+
+
+  <div class="clock is-running">08:15</div>
+</section>
+
+        <div class="dice-tray">
+          
+<div class="die-slot">
+  <button type="button" class="die is-selected" data-value="2" aria-pressed="true" aria-label="Кубик: 2"></button>
+
+    <span class="die-caption">
+      <span class="piece-icon" data-piece="wn"></span>
+      Белый конь
+    </span>
+</div>
+
+          
+<div class="die-slot">
+  <button type="button" class="die" data-value="5" aria-pressed="false" aria-label="Кубик: 5"></button>
+
+    <span class="die-caption">
+      <span class="piece-icon" data-piece="wq"></span>
+      Белый ферзь
+    </span>
+</div>
+
+        </div>
+      </div>
+
+      <aside class="game-side">
+        <div class="alert alert-info">Ваш ход: выберите кубик и фигуру.</div>
+        <section class="moves-panel">
+  <h3 class="moves-title">Ходы</h3>
+
+  <ol class="move-list">
+      <li class="move-row">
+        <span class="move-no">1.</span>
+          <span class="move">
+            <span class="die die-sm" data-value="1" aria-label="Кубик: 1"></span>
+            e4
+</span>          <span class="move">
+            <span class="die die-sm" data-value="1" aria-label="Кубик: 1"></span>
+            e5
+</span>      </li>
+      <li class="move-row">
+        <span class="move-no">2.</span>
+          <span class="move">
+            <span class="die die-sm" data-value="2" aria-label="Кубик: 2"></span>
+            Nf3
+</span>          <span class="move">
+            <span class="die die-sm" data-value="2" aria-label="Кубик: 2"></span>
+            Nc6
+</span>      </li>
+      <li class="move-row">
+        <span class="move-no">3.</span>
+          <span class="move">
+            <span class="die die-sm" data-value="3" aria-label="Кубик: 3"></span>
+            Bc4
+</span>          <span class="move is-current">
+            <span class="die die-sm" data-value="3" aria-label="Кубик: 3"></span>
+            Bc5
+</span>      </li>
+  </ol>
+</section>
+
+        
+<section class="chat" aria-label="Чат партии">
+  <ul class="chat-log">
+      <li class="chat-message">
+        <span class="chat-author">bob</span>
+        Привет! Играем?
+</li>      <li class="chat-message is-own">
+        <span class="chat-author">alice</span>
+        Да, 10 минут
+</li>      <li class="chat-message">
+        <span class="chat-author">bob</span>
+        Удачи, бросаю кубики
+</li>  </ul>
+
+  <form class="chat-form" action="#" method="get">
+    <label class="sr-only" for="game-chat-message">Сообщение</label>
+    <input class="input" id="game-chat-message" name="message" placeholder="Напишите сообщение">
+    <button class="btn btn-primary btn-icon" type="submit" aria-label="Отправить">
+      <span class="icon icon-arrow" aria-hidden="true"></span>
+    </button>
+  </form>
+</section>
+
+        <div class="game-controls">
+          <button class="btn btn-ghost" type="button"><span class="icon icon-equal" aria-hidden="true"></span> Ничья</button>
+          <button class="btn btn-danger" type="button"><span class="icon icon-flag" aria-hidden="true"></span> Сдаться</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="guide-section" id="screens">
+    <h2>Экраны</h2>
+    <p class="muted">Готовые экраны так, как они будут в проекте, с заглушками вместо данных. Игровой экран показан выше, в разделе «Партия целиком». Экраны входа и регистрации уже работают на сайте: <code>/login</code> и <code>/register</code>.</p>
+
+    <div class="screen">
+      <div class="screen-bar">
+        <span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-dot"></span>
+        <span class="screen-url">dicechess/lobby</span>
+      </div>
+      <div class="screen-body">
+        <div class="screen-head">
+          <h2>Лобби</h2>
+          <div class="input-group">
+            <input class="input" aria-label="Поиск игрока" placeholder="Найти игрока">
+            <button class="btn btn-ghost btn-icon" type="button" aria-label="Найти"><span class="icon icon-search" aria-hidden="true"></span></button>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="tab is-active" type="button" role="tab">Открытые партии</button>
+          <button class="tab" type="button" role="tab">Мои партии</button>
+          <button class="tab" type="button" role="tab">Рейтинг</button>
+        </div>
+
+        <div class="screen-split">
+          
+<form class="card" action="#" method="get">
+  <h3 class="card-title">Новая партия</h3>
+
+  <fieldset class="fieldset">
+    <legend class="legend">Играть за</legend>
+    <div class="choice-group">
+      <label class="choice">
+        <input type="radio" name="color" value="white" checked>
+        <span class="choice-body"><span class="piece-icon" data-piece="wk"></span> Белых</span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="color" value="black">
+        <span class="choice-body"><span class="piece-icon" data-piece="bk"></span> Чёрных</span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="color" value="random">
+        <span class="choice-body"><span class="icon icon-dice" aria-hidden="true"></span> Случайно</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="field">
+    <label class="label" for="screen-control">Контроль времени</label>
+    <select class="input" id="screen-control" name="control">
+      <option>5 минут</option>
+      <option selected>10 минут</option>
+      <option>15 + 10</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label class="switch">
+      <input type="checkbox" name="rated" checked>
+      <span class="switch-track"></span>
+      Рейтинговая партия
+    </label>
+  </div>
+
+  <button class="btn btn-primary btn-block" type="submit">
+    <span class="icon icon-plus" aria-hidden="true"></span> Создать партию
+  </button>
+</form>
+
+
+          <div class="guide-stack">
+            <div class="game-list">
+                <article class="game-card">
+  <div class="game-card-players">
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="wk" aria-label="Белые"></span>
+        <span class="avatar avatar-sm">A</span>
+        <span>alice</span>
+        <span class="muted">1512</span>
+      </div>
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="bk" aria-label="Чёрные"></span>
+        <span class="avatar avatar-sm">B</span>
+        <span>bob</span>
+        <span class="muted">1480</span>
+      </div>
+  </div>
+
+  <div class="game-card-meta">
+    <span class="badge">10 минут</span>
+    <span class="badge badge-accent">Два кубика</span>
+  </div>
+
+  <button type="button" class="btn btn-primary btn-sm">Играть</button>
+</article>
+
+                <article class="game-card">
+  <div class="game-card-players">
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="wk" aria-label="Белые"></span>
+        <span class="avatar avatar-sm">C</span>
+        <span>carol</span>
+        <span class="muted">1390</span>
+      </div>
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="bk" aria-label="Чёрные"></span>
+        <span class="avatar avatar-sm">D</span>
+        <span>dave</span>
+        <span class="muted">1405</span>
+      </div>
+  </div>
+
+  <div class="game-card-meta">
+    <span class="badge">5 минут</span>
+    <span class="badge badge-accent">Два кубика</span>
+  </div>
+
+  <button type="button" class="btn btn-primary btn-sm">Смотреть</button>
+</article>
+
+                <article class="game-card">
+  <div class="game-card-players">
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="wk" aria-label="Белые"></span>
+        <span class="avatar avatar-sm">E</span>
+        <span>erin</span>
+        <span class="muted">1620</span>
+      </div>
+      <div class="game-card-player">
+        <span class="piece-icon" data-piece="bk" aria-label="Чёрные"></span>
+        <span class="avatar avatar-sm">F</span>
+        <span>frank</span>
+        <span class="muted">1588</span>
+      </div>
+  </div>
+
+  <div class="game-card-meta">
+    <span class="badge">15 + 10</span>
+    <span class="badge badge-accent">Два кубика</span>
+  </div>
+
+  <button type="button" class="btn btn-primary btn-sm">Смотреть</button>
+</article>
+
+            </div>
+
+            <nav aria-label="Страницы">
+              <ul class="pagination">
+                <li><a class="page-link is-disabled" href="#screens" aria-disabled="true" aria-label="Назад">‹</a></li>
+                <li><a class="page-link is-active" href="#screens" aria-current="page">1</a></li>
+                <li><a class="page-link" href="#screens">2</a></li>
+                <li><a class="page-link" href="#screens" aria-label="Вперёд">›</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="screen-bar">
+        <span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-dot"></span>
+        <span class="screen-url">dicechess/profile</span>
+      </div>
+      <div class="screen-body">
+        <div class="screen-head">
+          <div class="profile-head">
+            <span class="avatar avatar-lg">A</span>
+            <div>
+              <h2>alice</h2>
+              <div class="row">
+                <span class="badge badge-accent">Рейтинг 1512</span>
+                <span class="caption">В игре с 05.10.2026</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-ghost" type="button">Изменить профиль</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+              <span class="stat-value">42</span>
+              <span class="stat-label">Партии</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">25</span>
+              <span class="stat-label">Победы</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">13</span>
+              <span class="stat-label">Поражения</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">4</span>
+              <span class="stat-label">Ничьи</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">1512</span>
+              <span class="stat-label">Рейтинг</span>
+            </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Соперник</th>
+                <th>Результат</th>
+                <th class="num">Ходов</th>
+                <th class="num">Рейтинг</th>
+                <th>Дата</th>
+              </tr>
+            </thead>
+            <tbody>
+                <tr>
+                  <td><span class="row"><span class="avatar avatar-sm">B</span> bob</span></td>
+                  <td><span class="badge badge-success">Победа</span></td>
+                  <td class="num">31</td>
+                  <td class="num">+12</td>
+                  <td>12.10.2026</td>
+                </tr>
+                <tr>
+                  <td><span class="row"><span class="avatar avatar-sm">C</span> carol</span></td>
+                  <td><span class="badge badge-error">Поражение</span></td>
+                  <td class="num">44</td>
+                  <td class="num">−9</td>
+                  <td>11.10.2026</td>
+                </tr>
+                <tr>
+                  <td><span class="row"><span class="avatar avatar-sm">D</span> dave</span></td>
+                  <td><span class="badge badge-warning">Ничья</span></td>
+                  <td class="num">58</td>
+                  <td class="num">+1</td>
+                  <td>10.10.2026</td>
+                </tr>
+                <tr>
+                  <td><span class="row"><span class="avatar avatar-sm">E</span> erin</span></td>
+                  <td><span class="badge badge-success">Победа</span></td>
+                  <td class="num">27</td>
+                  <td class="num">+14</td>
+                  <td>08.10.2026</td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+    </main>
+  </body>
+</html>

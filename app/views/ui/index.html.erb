@@ -21,7 +21,30 @@
   }
   moves = [ [ "e4", 1 ], [ "e5", 1 ], [ "Nf3", 2 ], [ "Nc6", 2 ], [ "Bc4", 3 ], [ "Bc5", 3 ] ]
   pieces = %w[k q r b n p]
-  icons = %w[x check menu plus flag equal swap refresh dice user contrast]
+  icons = %w[x check menu plus flag equal swap refresh dice user contrast arrow search]
+  chat_messages = [ [ "bob", "Привет! Играем?", false ], [ "alice", "Да, 10 минут", true ], [ "bob", "Удачи, бросаю кубики", false ] ]
+  type_rows = [
+    [ "Display", ".display", "32–48 px, 800", :p, "display", "Ходи с умом" ],
+    [ "Заголовок 1", "h1", "2 rem, 700", :h1, nil, "Лобби партий" ],
+    [ "Заголовок 2", "h2", "1.5 rem, 700", :h2, nil, "Ваш профиль" ],
+    [ "Заголовок 3", "h3", "1.125 rem, 700", :h3, nil, "Последние партии" ],
+    [ "Крупный", ".text-lg", "1.125 rem, 400", :p, "text-lg", "Выберите кубик и сделайте ход" ],
+    [ "Основной", "p", "1 rem, 400", :p, nil, "Партия начнётся, когда соперник примет вызов." ],
+    [ "Малый", ".text-sm", "0.875 rem, 400", :p, "text-sm", "Рейтинг изменится после окончания партии" ],
+    [ "Подпись", ".caption", "0.8 rem, 400", :p, "caption", "Обновлено 2 минуты назад" ],
+    [ "Код", ".mono", "моноширинный, 400", :p, "mono", "e2–e4 · 09:42 · +12" ]
+  ]
+  lobby_games = [
+    [ [ "alice", 1512 ], [ "bob", 1480 ], "10 минут", "Играть" ],
+    [ [ "carol", 1390 ], [ "dave", 1405 ], "5 минут", "Смотреть" ],
+    [ [ "erin", 1620 ], [ "frank", 1588 ], "15 + 10", "Смотреть" ]
+  ]
+  history = [
+    [ "bob", "Победа", "badge-success", 31, "+12", "12.10.2026" ],
+    [ "carol", "Поражение", "badge-error", 44, "−9", "11.10.2026" ],
+    [ "dave", "Ничья", "badge-warning", 58, "+1", "10.10.2026" ],
+    [ "erin", "Победа", "badge-success", 27, "+14", "08.10.2026" ]
+  ]
 %>
 
 <div class="guide">
@@ -37,13 +60,13 @@
     </div>
 
     <p class="muted">
-      Стили и компоненты для всего сайта: от форм входа до партии с двумя кубиками.
-      Файлы лежат в <code>public/ui/</code>, эта страница доступна только в development и test.
+      Верстка и стили всех элементов интерфейса сайта: шрифты, кнопки, формы, карточки и компоненты партии с двумя кубиками.
+      В конце страницы собраны готовые экраны с заглушками. Файлы лежат в <code>public/ui/</code>.
     </p>
 
     <nav class="tabs" aria-label="Разделы">
       <a class="tab" href="#colors">Цвета</a>
-      <a class="tab" href="#typography">Текст</a>
+      <a class="tab" href="#typography">Шрифты</a>
       <a class="tab" href="#buttons">Кнопки</a>
       <a class="tab" href="#forms">Формы</a>
       <a class="tab" href="#feedback">Уведомления</a>
@@ -56,8 +79,10 @@
       <a class="tab" href="#dice">Кубики</a>
       <a class="tab" href="#players">Игроки</a>
       <a class="tab" href="#dialogs">Диалоги партии</a>
-      <a class="tab" href="#lobby">Лобби</a>
+      <a class="tab" href="#gameforms">Формы партии</a>
+      <a class="tab" href="#lobby">Карточки партий</a>
       <a class="tab" href="#game">Партия</a>
+      <a class="tab" href="#screens">Экраны</a>
     </nav>
   </header>
 
@@ -79,24 +104,59 @@
   </section>
 
   <section class="guide-section" id="typography">
-    <h2>Текст</h2>
-    <div class="card">
-      <h1>Заголовок первого уровня</h1>
-      <h2>Заголовок второго уровня</h2>
-      <h3>Заголовок третьего уровня</h3>
-      <p>Обычный текст абзаца со <a href="#typography">ссылкой</a> и кодом <code>.btn-primary</code>.</p>
-      <p class="muted">Приглушённый текст для подсказок и подписей.</p>
+    <h2>Шрифты</h2>
+    <p class="muted">Шрифты системные: страница ничего не загружает и выглядит привычно на любой системе. Размеры и начертания заданы токенами <code>--text-*</code> и классами <code>.text-*</code>, <code>.fw-*</code>.</p>
+
+    <div class="guide-grid guide-grid-wide">
+      <div class="card font-card">
+        <span class="font-name">Основной · <code>--font</code></span>
+        <p class="text-2xl fw-700">Аа Бб Вв Gg Rr 123</p>
+        <p>АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+      </div>
+
+      <div class="card font-card">
+        <span class="font-name">Моноширинный · <code>--font-mono</code></span>
+        <p class="mono text-xl fw-700">09:42 · e2–e4 · +12</p>
+        <p class="mono">e4 Nf3 Bc4 O-O 1480 1512</p>
+      </div>
+
+      <div class="card font-card">
+        <span class="font-name">Шахматные символы · <code>--font-pieces</code></span>
+        <p class="font-pieces text-2xl">♔ ♕ ♖ ♗ ♘ ♙ ♚ ♛ ♜ ♝ ♞ ♟</p>
+      </div>
     </div>
+
+    <h3>Шкала размеров</h3>
+    <div>
+      <% type_rows.each do |label, selector, spec, tag_name, css_class, sample| %>
+        <div class="type-row">
+          <div><span><%= label %></span> <code><%= selector %></code></div>
+          <%= content_tag tag_name, sample, class: [ "type-sample", css_class ] %>
+          <div><%= spec %></div>
+        </div>
+      <% end %>
+    </div>
+
+    <h3>Начертания</h3>
+    <div class="row">
+      <span class="text-lg fw-500">Средний 500</span>
+      <span class="text-lg fw-600">Полужирный 600</span>
+      <span class="text-lg fw-700">Жирный 700</span>
+      <span class="text-lg fw-800">Сверхжирный 800</span>
+    </div>
+
+    <p>Текст со <a href="#typography">ссылкой</a>, <strong>выделением</strong> и <code>кодом</code> внутри абзаца.</p>
   </section>
 
   <section class="guide-section" id="buttons">
     <h2>Кнопки</h2>
-    <p class="muted"><code>.btn</code> + <code>.btn-primary</code>, <code>.btn-secondary</code>, <code>.btn-ghost</code>, <code>.btn-danger</code>; размеры <code>.btn-sm</code>, <code>.btn-lg</code>, <code>.btn-block</code>; кнопка-иконка <code>.btn-icon</code>.</p>
+    <p class="muted"><code>.btn</code> + <code>.btn-primary</code>, <code>.btn-secondary</code>, <code>.btn-ghost</code>, <code>.btn-danger</code>, <code>.btn-link</code>; размеры <code>.btn-sm</code>, <code>.btn-lg</code>, <code>.btn-block</code>; <code>.btn-icon</code>, <code>.btn-group</code>, состояния <code>disabled</code> и <code>.is-loading</code>.</p>
     <div class="row">
       <button class="btn btn-primary" type="button">Основная</button>
       <button class="btn btn-secondary" type="button">Вторичная</button>
       <button class="btn btn-ghost" type="button">Контурная</button>
       <button class="btn btn-danger" type="button">Сдаться</button>
+      <button class="btn btn-link" type="button">Кнопка-ссылка</button>
       <button class="btn btn-primary" type="button" disabled>Недоступна</button>
     </div>
     <div class="row">
@@ -109,6 +169,14 @@
       <button class="btn btn-ghost" type="button"><span class="icon icon-equal" aria-hidden="true"></span> Ничья</button>
       <button class="btn btn-ghost" type="button"><span class="icon icon-flag" aria-hidden="true"></span> Сдаться</button>
       <button class="btn btn-ghost btn-icon" type="button" aria-label="Перевернуть доску"><span class="icon icon-swap" aria-hidden="true"></span></button>
+    </div>
+    <div class="row">
+      <button class="btn btn-primary is-loading" type="button"><span class="spinner" aria-hidden="true"></span> Ищем соперника</button>
+      <div class="btn-group" role="group" aria-label="Оформление доски">
+        <button class="btn btn-ghost btn-sm is-active" type="button">Классика</button>
+        <button class="btn btn-ghost btn-sm" type="button">Контраст</button>
+        <button class="btn btn-ghost btn-sm" type="button">Тёмная</button>
+      </div>
     </div>
   </section>
 
@@ -142,7 +210,27 @@
       </div>
 
       <div class="field">
-        <label class="check"><input type="checkbox" checked> Играть на время</label>
+        <label class="label" for="demo-about">Свободный ввод</label>
+        <textarea class="input" id="demo-about" rows="4" maxlength="500" placeholder="Расскажите о себе"></textarea>
+        <p class="field-hint">До 500 символов.</p>
+      </div>
+
+      <div class="field">
+        <label class="label" for="demo-search">Поиск игрока</label>
+        <div class="input-group">
+          <input class="input" id="demo-search" placeholder="Никнейм">
+          <button class="btn btn-primary btn-icon" type="button" aria-label="Найти"><span class="icon icon-search" aria-hidden="true"></span></button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="legend">Флажок, переключатель и выбор</span>
+        <div class="row">
+          <label class="check"><input type="checkbox" checked> Играть на время</label>
+          <label class="check"><input type="radio" name="demo-radio" checked> Белые</label>
+          <label class="check"><input type="radio" name="demo-radio"> Чёрные</label>
+          <label class="switch"><input type="checkbox"><span class="switch-track"></span> Звук</label>
+        </div>
       </div>
     </div>
   </section>
@@ -181,6 +269,15 @@
       <span class="avatar avatar-lg">C</span>
     </div>
 
+    <div class="stats">
+      <% [ [ "42", "Партии" ], [ "25", "Победы" ], [ "13", "Поражения" ], [ "4", "Ничьи" ], [ "1512", "Рейтинг" ] ].each do |value, label| %>
+        <div class="stat">
+          <span class="stat-value"><%= value %></span>
+          <span class="stat-label"><%= label %></span>
+        </div>
+      <% end %>
+    </div>
+
     <div class="tabs" role="tablist">
       <button class="tab is-active" type="button" role="tab">Лобби</button>
       <button class="tab" type="button" role="tab">Мои партии</button>
@@ -209,6 +306,16 @@
         </tbody>
       </table>
     </div>
+
+    <nav aria-label="Страницы">
+      <ul class="pagination">
+        <li><a class="page-link is-disabled" href="#data" aria-disabled="true" aria-label="Назад">‹</a></li>
+        <li><a class="page-link is-active" href="#data" aria-current="page">1</a></li>
+        <li><a class="page-link" href="#data">2</a></li>
+        <li><a class="page-link" href="#data">3</a></li>
+        <li><a class="page-link" href="#data" aria-label="Вперёд">›</a></li>
+      </ul>
+    </nav>
   </section>
 
   <section class="guide-section" id="icons">
@@ -253,7 +360,7 @@
 
   <section class="guide-section" id="menu">
     <h2>Меню и подсказки</h2>
-    <p class="muted">Меню собрано на <code>&lt;details&gt;</code> и работает без скриптов. Список выпадает от левого края кнопки, для кнопки у правого края добавьте <code>.menu-end</code>. Подсказка берётся из <code>data-tooltip</code>, положение задаёт <code>data-tooltip-pos="bottom"</code>.</p>
+    <p class="muted">Меню собрано на <code>&lt;details&gt;</code> и работает без скриптов. Список выпадает от левого края кнопки, для кнопки у правого края добавьте <code>.menu-end</code>. Подсказка берётся из <code>data-tooltip</code>, положение задаёт <code>data-tooltip-pos="bottom"</code>, для кнопки у правого края добавьте <code>data-tooltip-align="end"</code>.</p>
     <div class="guide-menu">
       <details class="menu" open>
         <summary class="btn btn-ghost"><span class="icon icon-menu" aria-hidden="true"></span> Действия</summary>
@@ -359,12 +466,34 @@
     </div>
   </section>
 
+  <section class="guide-section" id="gameforms">
+    <h2>Формы партии</h2>
+    <p class="muted">Формы основного функционала: создание партии (выбор цвета карточками, контроль времени, переключатель рейтинга), чат со свободным вводом и заметка к партии.</p>
+    <div class="guide-grid guide-grid-wide">
+      <%= render "ui/create_game_form", prefix: "forms" %>
+
+      <div class="guide-stack">
+        <%= render "ui/chat", prefix: "forms-chat", messages: chat_messages %>
+
+        <form class="card" action="#" method="get">
+          <h3 class="card-title">Заметка к партии</h3>
+          <div class="field">
+            <label class="label" for="forms-note">Комментарий</label>
+            <textarea class="input" id="forms-note" name="note" rows="3" maxlength="500" placeholder="Что пошло не так, что запомнить"></textarea>
+            <p class="field-hint">До 500 символов.</p>
+          </div>
+          <button class="btn btn-secondary" type="submit">Сохранить заметку</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
   <section class="guide-section" id="lobby">
-    <h2>Лобби</h2>
+    <h2>Карточки партий</h2>
     <div class="game-list">
-      <%= render "ui/game_card", white: [ "alice", 1512 ], black: [ "bob", 1480 ], control: "10 минут", action: "Играть" %>
-      <%= render "ui/game_card", white: [ "carol", 1390 ], black: [ "dave", 1405 ], control: "5 минут", action: "Смотреть" %>
-      <%= render "ui/game_card", white: [ "erin", 1620 ], black: [ "frank", 1588 ], control: "15 + 10", action: "Смотреть" %>
+      <% lobby_games.each do |white, black, control, action| %>
+        <%= render "ui/game_card", white: white, black: black, control: control, action: action %>
+      <% end %>
     </div>
   </section>
 
@@ -385,11 +514,116 @@
       <aside class="game-side">
         <div class="alert alert-info">Ваш ход: выберите кубик и фигуру.</div>
         <%= render "ui/moves", moves: moves, current: [ 3, 1 ] %>
+        <%= render "ui/chat", prefix: "game-chat", messages: chat_messages %>
         <div class="game-controls">
           <button class="btn btn-ghost" type="button"><span class="icon icon-equal" aria-hidden="true"></span> Ничья</button>
           <button class="btn btn-danger" type="button"><span class="icon icon-flag" aria-hidden="true"></span> Сдаться</button>
         </div>
       </aside>
+    </div>
+  </section>
+
+  <section class="guide-section" id="screens">
+    <h2>Экраны</h2>
+    <p class="muted">Готовые экраны так, как они будут в проекте, с заглушками вместо данных. Игровой экран показан выше, в разделе «Партия целиком». Экраны входа и регистрации уже работают на сайте: <code>/login</code> и <code>/register</code>.</p>
+
+    <div class="screen">
+      <div class="screen-bar">
+        <span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-dot"></span>
+        <span class="screen-url">dicechess/lobby</span>
+      </div>
+      <div class="screen-body">
+        <div class="screen-head">
+          <h2>Лобби</h2>
+          <div class="input-group">
+            <input class="input" aria-label="Поиск игрока" placeholder="Найти игрока">
+            <button class="btn btn-ghost btn-icon" type="button" aria-label="Найти"><span class="icon icon-search" aria-hidden="true"></span></button>
+          </div>
+        </div>
+
+        <div class="tabs" role="tablist">
+          <button class="tab is-active" type="button" role="tab">Открытые партии</button>
+          <button class="tab" type="button" role="tab">Мои партии</button>
+          <button class="tab" type="button" role="tab">Рейтинг</button>
+        </div>
+
+        <div class="screen-split">
+          <%= render "ui/create_game_form", prefix: "screen" %>
+
+          <div class="guide-stack">
+            <div class="game-list">
+              <% lobby_games.each do |white, black, control, action| %>
+                <%= render "ui/game_card", white: white, black: black, control: control, action: action %>
+              <% end %>
+            </div>
+
+            <nav aria-label="Страницы">
+              <ul class="pagination">
+                <li><a class="page-link is-disabled" href="#screens" aria-disabled="true" aria-label="Назад">‹</a></li>
+                <li><a class="page-link is-active" href="#screens" aria-current="page">1</a></li>
+                <li><a class="page-link" href="#screens">2</a></li>
+                <li><a class="page-link" href="#screens" aria-label="Вперёд">›</a></li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="screen-bar">
+        <span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-dot"></span>
+        <span class="screen-url">dicechess/profile</span>
+      </div>
+      <div class="screen-body">
+        <div class="screen-head">
+          <div class="profile-head">
+            <span class="avatar avatar-lg">A</span>
+            <div>
+              <h2>alice</h2>
+              <div class="row">
+                <span class="badge badge-accent">Рейтинг 1512</span>
+                <span class="caption">В игре с 05.10.2026</span>
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-ghost" type="button">Изменить профиль</button>
+        </div>
+
+        <div class="stats">
+          <% [ [ "42", "Партии" ], [ "25", "Победы" ], [ "13", "Поражения" ], [ "4", "Ничьи" ], [ "1512", "Рейтинг" ] ].each do |value, label| %>
+            <div class="stat">
+              <span class="stat-value"><%= value %></span>
+              <span class="stat-label"><%= label %></span>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="table-wrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Соперник</th>
+                <th>Результат</th>
+                <th class="num">Ходов</th>
+                <th class="num">Рейтинг</th>
+                <th>Дата</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% history.each do |opponent, result, badge, turns, delta, date| %>
+                <tr>
+                  <td><span class="row"><span class="avatar avatar-sm"><%= opponent.first.upcase %></span> <%= opponent %></span></td>
+                  <td><%= tag.span result, class: [ "badge", badge ] %></td>
+                  <td class="num"><%= turns %></td>
+                  <td class="num"><%= delta %></td>
+                  <td><%= date %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </section>
 </div>

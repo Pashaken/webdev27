@@ -1,0 +1,44 @@
+<% prefix = local_assigns.fetch(:prefix, "create") %>
+
+<form class="card" action="#" method="get">
+  <h3 class="card-title">Новая партия</h3>
+
+  <fieldset class="fieldset">
+    <legend class="legend">Играть за</legend>
+    <div class="choice-group">
+      <label class="choice">
+        <input type="radio" name="color" value="white" checked>
+        <span class="choice-body"><span class="piece-icon" data-piece="wk"></span> Белых</span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="color" value="black">
+        <span class="choice-body"><span class="piece-icon" data-piece="bk"></span> Чёрных</span>
+      </label>
+      <label class="choice">
+        <input type="radio" name="color" value="random">
+        <span class="choice-body"><span class="icon icon-dice" aria-hidden="true"></span> Случайно</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="field">
+    <label class="label" for="<%= prefix %>-control">Контроль времени</label>
+    <select class="input" id="<%= prefix %>-control" name="control">
+      <option>5 минут</option>
+      <option selected>10 минут</option>
+      <option>15 + 10</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label class="switch">
+      <input type="checkbox" name="rated" checked>
+      <span class="switch-track"></span>
+      Рейтинговая партия
+    </label>
+  </div>
+
+  <button class="btn btn-primary btn-block" type="submit">
+    <span class="icon icon-plus" aria-hidden="true"></span> Создать партию
+  </button>
+</form>

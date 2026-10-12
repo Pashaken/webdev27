@@ -1,0 +1,20 @@
+<% prefix = local_assigns.fetch(:prefix, "chat") %>
+
+<section class="chat" aria-label="Чат партии">
+  <ul class="chat-log">
+    <% messages.each do |author, text, own| %>
+      <%= tag.li class: [ "chat-message", ("is-own" if own) ] do %>
+        <span class="chat-author"><%= author %></span>
+        <%= text %>
+      <% end %>
+    <% end %>
+  </ul>
+
+  <form class="chat-form" action="#" method="get">
+    <label class="sr-only" for="<%= prefix %>-message">Сообщение</label>
+    <input class="input" id="<%= prefix %>-message" name="message" placeholder="Напишите сообщение">
+    <button class="btn btn-primary btn-icon" type="submit" aria-label="Отправить">
+      <span class="icon icon-arrow" aria-hidden="true"></span>
+    </button>
+  </form>
+</section>

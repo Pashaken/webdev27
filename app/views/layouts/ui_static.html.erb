@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8">
+    <title>DiceChess — UI-кит</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="icon" href="icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <script src="ui/theme.js"></script>
+    <link rel="stylesheet" href="ui/tokens.css">
+    <link rel="stylesheet" href="ui/base.css">
+    <link rel="stylesheet" href="ui/components.css">
+    <link rel="stylesheet" href="ui/icons.css">
+    <link rel="stylesheet" href="ui/game.css">
+    <link rel="stylesheet" href="ui/guide.css">
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="container header-inner">
+        <a class="brand" href="ui-kit.html">DiceChess</a>
+
+        <nav class="nav">
+          <button class="btn btn-ghost btn-sm btn-icon" type="button" data-theme-toggle data-tooltip="Сменить тему" data-tooltip-pos="bottom" data-tooltip-align="end" aria-label="Сменить тему">
+            <span class="icon icon-contrast" aria-hidden="true"></span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container main">
+      <%= yield %>
+    </main>
+  </body>
+</html>
