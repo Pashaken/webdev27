@@ -26,22 +26,22 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
   test "registration creates user, hashes password and logs in" do
     assert_difference "User.count", 1 do
-      post register_path, params: { user: { username: "bob", password: "secret123" } }
+      post register_path, params: { user: { username: "dave", password: "secret123" } }
     end
     assert_redirected_to root_path
 
-    user = User.find_by!(username: "bob")
+    user = User.find_by!(username: "dave")
     assert user.password_digest.start_with?("$2")
     assert_not_includes user.password_digest, "secret123"
 
     follow_redirect!
     assert_response :success
-    assert_select "h1", "Привет, bob!"
+    assert_select "h1", "Привет, dave!"
   end
 
   test "registration with invalid data shows errors and creates nothing" do
     assert_no_difference "User.count" do
-      post register_path, params: { user: { username: "bob", password: "123" } }
+      post register_path, params: { user: { username: "dave", password: "123" } }
     end
     assert_response :unprocessable_entity
     assert_select "li", /Пароль слишком короткий/

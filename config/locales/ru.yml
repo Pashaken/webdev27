@@ -2,15 +2,66 @@ ru:
   activerecord:
     models:
       user: Пользователь
+      game: Партия
+      move: Ход
     attributes:
       user:
         username: Никнейм
         password: Пароль
+        rating: Рейтинг
+      game:
+        white_player: Белые
+        black_player: Чёрные
+        status: Статус
+        result: Результат
+        end_reason: Причина окончания
+        turn: Очередь хода
+        initial_seconds: Время на партию
+        increment_seconds: Добавка за ход
+        dice_a: Первый кубик
+        dice_b: Второй кубик
+        chosen_die: Выбранный кубик
+      move:
+        ply: Номер хода
+        color: Цвет
+        piece: Фигура
+        from_square: Откуда
+        to_square: Куда
+        die_used: Кубик
+    errors:
+      messages:
+        restrict_dependent_destroy:
+          has_many: "Нельзя удалить запись, пока есть связанные записи (%{record})"
+      models:
+        game:
+          attributes:
+            black_player:
+              same_as_white: не может быть тем же игроком, что и белые
+            chosen_die:
+              not_rolled: не выпал на кубиках
+          no_players: в партии должен быть хотя бы один игрок
+          opponent_missing: для начатой партии нужны оба игрока
+        move:
+          attributes:
+            to_square:
+              same_as_from: должна отличаться от клетки, откуда сделан ход
+            die_used:
+              not_rolled: не выпал на кубиках
+            piece:
+              does_not_match_die: не соответствует выбранному кубику
   errors:
     format: "%{attribute} %{message}"
     messages:
       blank: не может быть пустым
+      present: должно быть пустым
       taken: уже занят
       too_short: слишком короткий (минимум %{count})
       too_long: слишком длинный (максимум %{count})
       invalid: имеет неверный формат
+      inclusion: имеет недопустимое значение
+      required: должен существовать
+      not_a_number: должно быть числом
+      not_an_integer: должно быть целым числом
+      greater_than: должно быть больше %{count}
+      greater_than_or_equal_to: должно быть не меньше %{count}
+      less_than_or_equal_to: должно быть не больше %{count}

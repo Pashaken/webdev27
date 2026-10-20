@@ -15,6 +15,13 @@
 
 Тесты: `ruby bin/rails test`
 
+## База данных и модели
+
+Схема базы (ER-диаграмма, таблицы, правила): [docs/database.md](docs/database.md).
+Модели лежат в `app/models/`: `User`, `Game`, `Move` и `EloRating` (расчёт рейтинга).
+Миграции применяются командой `ruby bin/rails db:migrate`, тесты моделей запускаются командой
+`ruby bin/rails test test/models`.
+
 ## UI-кит
 
 Стили лежат в `public/ui/`: `tokens.css` (цвета, отступы, шрифты, светлая и тёмная тема), `base.css`,
