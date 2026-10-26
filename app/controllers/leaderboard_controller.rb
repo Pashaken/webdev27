@@ -4,7 +4,8 @@ class LeaderboardController < ApplicationController
   before_action :require_login
 
   def index
-    @users = User.order(rating: :desc, username: :asc).limit(LIMIT).to_a
+    @users = User.where(id: GamePlayer.in_finished_games.select(:user_id))
+                 .order(rating: :desc, username: :asc).limit(LIMIT).to_a
     ids = @users.map(&:id)
 
     @games = grouped(GamePlayer.in_finished_games, ids)

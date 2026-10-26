@@ -1,43 +1,47 @@
-<% content_for :title, "DiceChess — Рейтинг" %>
+<% content_for :title, "DiceChess — Лидерборд" %>
 
 <section class="profile-section">
-  <h1 class="lobby-title">Рейтинг игроков</h1>
+  <h1 class="lobby-title">Лидерборд</h1>
 
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th class="num">#</th>
-          <th>Игрок</th>
-          <th class="num">Рейтинг</th>
-          <th class="num">Партии</th>
-          <th class="num">Победы</th>
-          <th class="num">Поражения</th>
-          <th class="num">Ничьи</th>
-          <th class="num" title="Победы / (победы + поражения), ничьи не считаются">Побед</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @users.each.with_index(1) do |user, place| %>
-          <% games = @games.fetch(user.id, 0) %>
-          <% wins = @wins.fetch(user.id, 0) %>
-          <%= tag.tr class: ("is-me" if user == current_user) do %>
-            <td class="num"><%= place %></td>
-            <td>
-              <span class="row">
-                <span class="avatar avatar-sm"><%= user.username.first.upcase %></span>
-                <%= link_to user.username, player_path(user) %>
-              </span>
-            </td>
-            <td class="num"><%= user.rating %></td>
-            <td class="num"><%= games %></td>
-            <td class="num"><%= wins %></td>
-            <td class="num"><%= @losses.fetch(user.id, 0) %></td>
-            <td class="num"><%= @draws.fetch(user.id, 0) %></td>
-            <td class="num"><%= win_rate_text(User.win_rate(wins, @losses.fetch(user.id, 0))) %></td>
+  <% if @users.empty? %>
+    <p class="muted">Пока никто не сыграл ни одной партии.</p>
+  <% else %>
+    <div class="table-wrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th class="num">#</th>
+            <th>Игрок</th>
+            <th class="num">Рейтинг</th>
+            <th class="num">Партии</th>
+            <th class="num">Победы</th>
+            <th class="num">Поражения</th>
+            <th class="num">Ничьи</th>
+            <th class="num" title="Победы / (победы + поражения), ничьи не считаются">Побед</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @users.each.with_index(1) do |user, place| %>
+            <% wins = @wins.fetch(user.id, 0) %>
+            <% losses = @losses.fetch(user.id, 0) %>
+            <%= tag.tr class: ("is-me" if user == current_user) do %>
+              <td class="num"><%= place %></td>
+              <td>
+                <span class="row">
+                  <span class="avatar avatar-sm"><%= user.username.first.upcase %></span>
+                  <%= link_to user.username, player_path(user) %>
+                </span>
+              </td>
+              <td class="num"><%= user.rating %></td>
+              <td class="num"><%= @games.fetch(user.id, 0) %></td>
+              <td class="num"><%= wins %></td>
+              <td class="num"><%= losses %></td>
+              <td class="num"><%= @draws.fetch(user.id, 0) %></td>
+              <td class="num"><%= win_rate_text(User.win_rate(wins, losses)) %></td>
+            <% end %>
           <% end %>
-        <% end %>
-      </tbody>
-    </table>
-  </div>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
 </section>

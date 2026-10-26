@@ -14,40 +14,78 @@ class LeaderboardTest < ActionDispatch::IntegrationTest
     row.css("td").map { |cell| cell.text.strip }.values_at(0, 2, 3, 4, 5, 6, 7)
   end
 
+  def play_unrated(white, black)
+    start_game(white: users(white), black: users(black), rated: false).resign!(users(black))
+  end
+
   test "players are ordered by rating and numbered" do
+    play_unrated(:alice, :bob)
+    play_unrated(:carol, :alice)
     users(:carol).update!(rating: 1600)
     users(:bob).update!(rating: 1400)
 
     as(@alice) do
       get leaderboard_path
       assert_response :success
+      assert_select "h1", "Лидерборд"
       assert_equal %w[carol alice bob], names
       assert_equal %w[1 2 3], css_select("tbody tr").map { |row| row.at_css("td").text.strip }
     end
   end
 
   test "equal ratings are ordered by name" do
+    play_unrated(:carol, :bob)
+    play_unrated(:bob, :alice)
+
     as(@alice) do
       get leaderboard_path
       assert_equal %w[alice bob carol], names
     end
   end
 
-  test "statistics come from finished games" do
+  test "only players with finished games are listed" do
+    play_unrated(:alice, :bob)
+    start_game(white: users(:carol), black: users(:bob))
+
+    as(@alice) do
+      get leaderboard_path
+      assert_equal %w[alice bob], names
+    end
+  end
+
+  test "an empty leaderboard says that nobody has played yet" do
+    start_game
+
+    as(@alice) do
+      get leaderboard_path
+      assert_response :success
+      assert_select "table", 0
+      assert_select ".profile-section", /Пока никто не сыграл ни одной партии/
+    end
+  end
+
+  test "statistics come from finished games and draws stay out of the win rate" do
     start_game.resign!(users(:bob))
+
     drawn = start_game(white: users(:bob), black: users(:alice), rated: false)
     drawn.offer_draw!(users(:bob))
     drawn.accept_draw!(users(:alice))
 
+    only_draw = start_game(white: users(:carol), black: users(:bob), rated: false)
+    only_draw.offer_draw!(users(:carol))
+    only_draw.accept_draw!(users(:bob))
+
     as(@alice) do
       get leaderboard_path
       assert_equal %w[1 1516 2 1 0 1 100%], numbers("alice")
-      assert_equal %w[2 1500 0 0 0 0 —], numbers("carol")
-      assert_equal %w[3 1484 2 0 1 1 0%], numbers("bob")
+      assert_equal %w[2 1500 1 0 0 1 —], numbers("carol")
+      assert_equal %w[3 1484 3 0 1 2 0%], numbers("bob")
     end
   end
 
   test "names lead to profiles and the own row is marked" do
+    play_unrated(:alice, :bob)
+
     as(@alice) do
       get leaderboard_path
       assert_select "tbody td a[href=?]", player_path(users(:bob)), text: "bob"
@@ -59,7 +97,7 @@ class LeaderboardTest < ActionDispatch::IntegrationTest
   test "the navigation links to the lobby, the leaderboard and the profile" do
     as(@alice) do
       get leaderboard_path
-      assert_select "a.nav-link[href=?][aria-current=page]", leaderboard_path, text: "Рейтинг"
+      assert_select "a.nav-link[href=?][aria-current=page]", leaderboard_path, text: "Лидерборд"
       assert_select "a.nav-link[href=?]:not([aria-current])", root_path, text: "Лобби"
       assert_select "a.nav-user[href=?]", profile_path
 
