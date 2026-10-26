@@ -1,0 +1,70 @@
+<% content_for :title, "DiceChess — #{@user.username}" %>
+
+<div class="profile">
+  <div class="profile-head">
+    <span class="avatar avatar-lg"><%= @user.username.first.upcase %></span>
+    <div>
+      <h1><%= @user.username %></h1>
+      <div class="row">
+        <span class="badge badge-accent">Рейтинг <%= @user.rating %></span>
+        <% if @user.created_at %>
+          <span class="caption">В игре с <%= @user.created_at.strftime("%d.%m.%Y") %></span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <% [ [ @user.finished_games_count, "Партии" ], [ @user.wins_count, "Победы" ],
+         [ @user.losses_count, "Поражения" ], [ @user.draws_count, "Ничьи" ],
+         [ "#{@user.win_rate}%", "Процент побед" ], [ @user.rating, "Рейтинг" ] ].each do |value, label| %>
+      <div class="stat">
+        <span class="stat-value"><%= value %></span>
+        <span class="stat-label"><%= label %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <section class="profile-section">
+    <h2>Последние партии</h2>
+
+    <% if @history.empty? %>
+      <p class="muted">Завершённых партий пока нет.</p>
+    <% else %>
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Соперник</th>
+              <th>Результат</th>
+              <th class="num">Ходов</th>
+              <th class="num">Рейтинг</th>
+              <th>Дата</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @history.each do |seat| %>
+              <% game = seat.game %>
+              <% opponent = game.opponent_of(@user) %>
+              <% title, badge = outcome_badge(game.outcome_for(@user)) %>
+              <tr>
+                <td>
+                  <span class="row">
+                    <span class="avatar avatar-sm"><%= opponent.username.first.upcase %></span>
+                    <%= link_to opponent.username, player_path(opponent) %>
+                  </span>
+                </td>
+                <td><%= tag.span title, class: [ "badge", badge ] %></td>
+                <td class="num"><%= @move_counts.fetch(game.id, 0) %></td>
+                <td class="num"><%= rating_change(game, @user) %></td>
+                <td><%= game.finished_at.strftime("%d.%m.%Y") %></td>
+                <td><%= link_to "Открыть", game_path(game) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% end %>
+  </section>
+</div>

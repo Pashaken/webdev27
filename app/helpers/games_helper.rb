@@ -8,12 +8,22 @@ module GamesHelper
     "king_captured" => "Король взят"
   }.freeze
 
+  OUTCOME_BADGES = {
+    "win" => [ "Победа", "badge-success" ],
+    "loss" => [ "Поражение", "badge-error" ],
+    "draw" => [ "Ничья", "badge-warning" ]
+  }.freeze
+
   RESIGNED_LABEL = "Вы сдались".freeze
   COLOR_LABELS = { "white" => "белые", "black" => "чёрные" }.freeze
 
   def lobby_player(game, color)
     seat = game.game_player_of(color)
     [ seat.user.username, seat.rating_before || seat.user.rating ] if seat
+  end
+
+  def outcome_badge(outcome)
+    OUTCOME_BADGES.fetch(outcome)
   end
 
   def clock_text(seconds)

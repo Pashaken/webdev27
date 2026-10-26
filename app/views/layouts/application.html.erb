@@ -28,7 +28,7 @@
           </button>
 
           <% if current_user %>
-            <span class="nav-user"><%= current_user.username %></span>
+            <%= link_to current_user.username, profile_path, class: "nav-link nav-user" %>
             <%= button_to "Выйти", logout_path, method: :delete, class: "btn btn-ghost btn-sm", form_class: "nav-form" %>
           <% else %>
             <%= link_to "Войти", login_path, class: "nav-link" %>

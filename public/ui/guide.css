@@ -306,22 +306,6 @@
   align-items: start;
 }
 
-.profile-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-4);
-}
-
-.profile-head > div {
-  display: grid;
-  gap: var(--space-2);
-}
-
-.profile-head h2 {
-  margin: 0;
-}
-
 @media (max-width: 860px) {
   .screen-split {
     grid-template-columns: minmax(0, 1fr);
