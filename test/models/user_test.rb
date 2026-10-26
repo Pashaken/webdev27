@@ -87,8 +87,8 @@ class UserStatisticsTest < ActiveSupport::TestCase
 
   test "games include games played as white and as black" do
     assert_equal 4, @alice.games.count
-    assert_equal 2, @alice.games_as_white.count
-    assert_equal 2, @alice.games_as_black.count
+    assert_equal 2, @alice.game_players.where(color: "white").count
+    assert_equal 2, @alice.game_players.where(color: "black").count
   end
 
   test "counts wins, losses and draws of finished games only" do

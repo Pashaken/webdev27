@@ -6,105 +6,145 @@ PostgreSQL. Источник правды: миграции в `db/migrate/` и 
 
 ```mermaid
 erDiagram
-    users ||--o{ games : "играет белыми (white_player_id)"
-    users ||--o{ games : "играет чёрными (black_player_id)"
-    users ||--o{ moves : "делает ход (player_id)"
-    games ||--o{ moves : "состоит из ходов (game_id)"
+    users ||--o{ game_players : "участвует"
+    games ||--|{ game_players : "два игрока"
+    time_controls ||--o{ games : "контроль времени"
+    games ||--o{ game_dice_states : "броски кубиков"
+    dice_states ||--o{ game_dice_states : "комбинация"
+    game_players ||--o{ game_dice_states : "бросает"
+    games ||--o{ moves : "ходы"
+    game_players ||--o{ moves : "делает"
+    game_dice_states ||--o| moves : "ход по броску"
+    games ||--o{ draw_offers : "предложения ничьей"
+    game_players ||--o{ draw_offers : "предлагает"
 
     users {
         int id PK
-        string username UK "ник, 3-50 символов"
-        string password_digest "bcrypt-хеш пароля"
-        int rating "рейтинг Эло, по умолчанию 1500, минимум 100"
+        string username UK "ник"
+        string password_digest "bcrypt-хеш"
+        int rating "текущий рейтинг Эло"
         datetime created_at
+    }
+
+    time_controls {
+        bigint id PK
+        int initial_seconds "время на партию"
+        int increment_seconds "добавка за ход"
     }
 
     games {
         bigint id PK
-        int white_player_id FK "может быть пустым, пока нет соперника"
-        int black_player_id FK "может быть пустым, пока нет соперника"
-        string status "waiting, active, finished"
+        bigint time_control_id FK
+        boolean rated
         string result "white_win, black_win, draw"
         string end_reason "checkmate, resignation, timeout, stalemate, agreement"
-        string turn "white или black"
-        string fen "текущая позиция"
-        boolean rated "влияет ли партия на рейтинг"
-        int initial_seconds "время на партию"
-        int increment_seconds "добавка за ход"
-        int white_seconds_left "остаток времени белых"
-        int black_seconds_left "остаток времени чёрных"
-        int dice_a "первый кубик текущего хода"
-        int dice_b "второй кубик текущего хода"
-        int chosen_die "выбранный кубик"
-        string draw_offered_by "кто предложил ничью"
-        int white_rating_delta "изменение рейтинга белых"
-        int black_rating_delta "изменение рейтинга чёрных"
         datetime started_at
         datetime finished_at
-        datetime created_at
-        datetime updated_at
+    }
+
+    game_players {
+        bigint id PK
+        bigint game_id FK
+        int user_id FK
+        string color "white или black"
+        int rating_before "рейтинг на старте партии"
+        int rating_delta "изменение рейтинга"
+    }
+
+    dice_states {
+        bigint id PK
+        int first_die "1-6"
+        int second_die "1-6"
+    }
+
+    game_dice_states {
+        bigint id PK
+        bigint game_id FK
+        bigint dice_state_id FK
+        bigint game_player_id FK "кто бросал"
+        int ply "для какого хода бросок"
+        int chosen_die "выбранный кубик"
     }
 
     moves {
         bigint id PK
         bigint game_id FK
-        int player_id FK
-        int ply "номер хода, 1, 2, 3 ..."
-        string color "white или black"
+        bigint game_player_id FK
+        bigint game_dice_state_id FK
+        int ply "номер хода"
         string piece "p, n, b, r, q, k"
-        string from_square "например e2"
-        string to_square "например e4"
+        string from_square
+        string to_square
+        string promotion
+        string captured
         string san "запись хода"
-        string captured "съеденная фигура"
-        int die_a "первый кубик"
-        int die_b "второй кубик"
-        int die_used "кубик, которым сделан ход"
-        string fen_after "позиция после хода"
-        int spent_seconds "затраченное время"
-        datetime created_at
+        int spent_seconds
+    }
+
+    draw_offers {
+        bigint id PK
+        bigint game_id FK
+        bigint game_player_id FK
+        int ply "сколько ходов было сделано"
     }
 ```
 
-## Таблицы
+## Как это связано со схемой на доске
 
-### users
-Игроки. Таблица создана ещё первой версией проекта, миграция `CreateUsers` подхватывает уже существующую.
-Миграция `AddRatingToUsers` добавляет рейтинг. Ограничения: уникальный ник, `rating >= 100`.
+На рисунке: `Game` — `GameDiceState` — `DiceStates`. В проекте это таблицы `games`, `game_dice_states` и `dice_states`.
 
-### games
-Партия двух игроков. Создатель занимает свободное место (белые или чёрные), второе место пустое, пока соперник
-не присоединится (`status = waiting`). Состояние кубиков текущего хода хранится прямо в партии
-(`dice_a`, `dice_b`, `chosen_die`) и очищается после хода.
+- `dice_states` хранит каждую комбинацию двух кубиков один раз (`id`, `first_die`, `second_die`; на рисунке `p1_dice` и `p2_dice`).
+  Оба кубика бросает один и тот же игрок, поэтому колонки названы по порядку, а не по игрокам.
+- `game_dice_states` связывает партию с комбинациями: связь «многие ко многим». У партии много бросков,
+  а одна комбинация (например, 3 и 5) встречается во множестве партий и записана в базе один раз.
+  В связке ещё хранятся номер хода, игрок, который бросал, и выбранный кубик.
 
-Ограничения на уровне БД: допустимые значения `status`, `turn`, `result`, кубики от 1 до 6,
-игрок не может играть сам с собой, остаток времени не отрицательный. Индексы: по `status`,
-по `white_player_id` и `black_player_id`.
+## Что вынесено и что теперь вычисляется
 
-### moves
-Каждый ход партии. Вместе с ходом сохраняются оба выпавших кубика и тот, которым ходили
-(`die_used`), позиция после хода и затраченное время. Уникальный индекс `(game_id, ply)` не даёт
-записать два хода с одним номером. Проверки: `ply > 0`, `die_used` равен одному из двух кубиков.
+Принцип: в базе лежат только факты (ходы, броски, участники), а всё, что можно получить из них, вычисляется.
+
+| Раньше хранилось | Теперь |
+|---|---|
+| Позиция в каждом ходе (`fen_after`) и текущая позиция (`games.fen`) | вычисляется повторным проигрыванием ходов (`Position.replay`) |
+| Чья очередь (`games.turn`) | вычисляется по числу сделанных ходов |
+| Остаток времени (`white_seconds_left`, `black_seconds_left`) | считается по затраченному на ходы времени и добавке |
+| Текущие кубики в партии (`dice_a`, `dice_b`, `chosen_die`) и в ходе (`die_a`, `die_b`, `die_used`) | вынесены в `dice_states` и `game_dice_states` |
+| Статус партии (`games.status`) | вычисляется по `started_at` и `finished_at` |
+| Кто предложил ничью (`draw_offered_by`) | таблица `draw_offers`, предложение действует, пока не сделан следующий ход |
+| Белые и чёрные (`white_player_id`, `black_player_id`) и изменения рейтинга в партии | таблица `game_players`, по строке на игрока |
+| Время на партию и добавка в каждой партии | таблица `time_controls`, повторяющиеся значения хранятся один раз |
+| Цвет и игрок в каждом ходе | берутся через `game_players` |
+
+Намеренно оставлено сохранённым: `users.rating` (текущий рейтинг, обновляется по итогам партии),
+`game_players.rating_before` и `rating_delta` (факт партии), `moves.captured` и `moves.san` (запись хода).
+
+## Целостность на уровне БД
+
+Внешние ключи; уникальные индексы `(game_id, ply)` у ходов и бросков, `(game_id, color)` и `(game_id, user_id)` у игроков,
+`(first_die, second_die)` у комбинаций кубиков, `game_dice_state_id` у ходов (один ход на бросок);
+проверки допустимых значений (цвет, результат, причина окончания, кубики от 1 до 6, `ply > 0`, время не отрицательное),
+`finished_at` и `result` заполнены только вместе, рейтинг не ниже 100.
 
 ## Связи в моделях
 
 | Модель | Связи |
 |---|---|
-| `User` | `has_many :games_as_white`, `:games_as_black`, `:moves` (удаление игрока с партиями запрещено) |
-| `Game` | `belongs_to :white_player`, `:black_player` (оба необязательны), `has_many :moves` (по порядку `ply`, удаляются вместе с партией) |
-| `Move` | `belongs_to :game`, `:player` |
+| `User` | `has_many :game_players`, `:games` и `:moves` через игрока партии (удаление игрока с партиями запрещено) |
+| `Game` | `belongs_to :time_control`, `has_many :game_players`, `:moves`, `:game_dice_states`, `:draw_offers`, `:dice_states` и `:users` через связки |
+| `GamePlayer` | `belongs_to :game`, `:user`; `has_many :moves`, `:game_dice_states`, `:draw_offers` |
+| `GameDiceState` | `belongs_to :game`, `:dice_state`, `:game_player`; `has_one :move` |
+| `DiceState` | `has_many :game_dice_states`, `:games` через них |
+| `Move` | `belongs_to :game`, `:game_player`, `:game_dice_state` |
+| `TimeControl`, `DrawOffer` | `has_many :games` и `belongs_to :game`, `:game_player` |
 
 ## Бизнес-правила
 
 - **Кубики и фигуры.** Игрок бросает два кубика и выбирает значение одного из них. Значение определяет фигуру,
   которой можно ходить: 1 пешка, 2 конь, 3 слон, 4 ладья, 5 ферзь, 6 король (`Game::DICE_PIECES`).
-  Ход фигурой, не соответствующей выбранному кубику, не записывается.
-- **Очередь хода.** Бросать кубики, выбирать кубик и ходить может только игрок, чья очередь.
-- **Часы.** При ходе вычитается затраченное время и добавляется добавка за ход. Если время вышло, партия
-  заканчивается поражением по времени, а ход не записывается.
-- **Ничья.** Один игрок предлагает, другой принимает; собственное предложение принять нельзя, ход сбрасывает предложение.
-- **Рейтинг.** В рейтинговой партии по окончании рейтинги меняются по формуле Эло (`EloRating`, K = 32),
-  изменение сохраняется в `white_rating_delta` и `black_rating_delta`. Рейтинг не опускается ниже 100.
-- **Статистика игрока.** `User#wins_count`, `#losses_count`, `#draws_count`, `#win_rate` считаются по завершённым партиям.
-
-Правила шахмат (допустимые клетки хода, шах, мат) в моделях пока не проверяются: позицию и запись хода передаёт
-игровой движок, а модель следит за очередью, кубиками, временем и результатом.
+- **Очередь хода.** Бросать кубики, выбирать кубик и ходить может только игрок, чья очередь. Один бросок на ход.
+- **Позиция.** Модель `Position` проигрывает ходы с начальной расстановки: взятие, взятие на проходе, рокировка,
+  превращение пешки, права на рокировку, счётчики ходов. Ход записывается, только если на клетке старта стоит
+  нужная фигура игрока и клетка назначения не занята его же фигурой. Допустимость хода по правилам шахмат (шах, мат) пока не проверяется.
+- **Часы.** Остаток времени вычисляется. Если затраченное время не меньше остатка, партия заканчивается поражением по времени.
+- **Ничья.** Один игрок предлагает, другой принимает; собственное предложение принять нельзя; следующий ход отменяет предложение.
+- **Рейтинг.** В рейтинговой партии по окончании рейтинги меняются по формуле Эло (`EloRating`, K = 32), не ниже 100.

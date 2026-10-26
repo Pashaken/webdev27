@@ -6,74 +6,112 @@ class Game < ApplicationRecord
   END_REASONS = %w[checkmate resignation timeout stalemate agreement].freeze
   DICE_PIECES = { 1 => "p", 2 => "n", 3 => "b", 4 => "r", 5 => "q", 6 => "k" }.freeze
 
-  enum :status, { waiting: "waiting", active: "active", finished: "finished" }, default: "waiting", validate: true
-
-  belongs_to :white_player, class_name: "User", optional: true, inverse_of: :games_as_white
-  belongs_to :black_player, class_name: "User", optional: true, inverse_of: :games_as_black
+  belongs_to :time_control
   has_many :moves, -> { order(:ply) }, dependent: :destroy, inverse_of: :game
+  has_many :game_dice_states, -> { order(:ply) }, dependent: :destroy, inverse_of: :game
+  has_many :dice_states, through: :game_dice_states
+  has_many :draw_offers, dependent: :destroy, inverse_of: :game
+  has_many :game_players, dependent: :destroy, inverse_of: :game
+  has_many :users, through: :game_players
 
-  scope :involving, ->(user) { where("white_player_id = :id OR black_player_id = :id", id: user.id) }
-  scope :won_by, ->(user) {
-    where("(white_player_id = :id AND result = 'white_win') OR (black_player_id = :id AND result = 'black_win')", id: user.id)
-  }
-  scope :lost_by, ->(user) {
-    where("(white_player_id = :id AND result = 'black_win') OR (black_player_id = :id AND result = 'white_win')", id: user.id)
-  }
-  scope :drawn, -> { where(result: "draw") }
+  delegate :initial_seconds, :increment_seconds, to: :time_control
 
-  before_validation :start_clocks, on: :create
+  scope :waiting, -> { where(started_at: nil) }
+  scope :active, -> { where.not(started_at: nil).where(finished_at: nil) }
+  scope :finished, -> { where.not(finished_at: nil) }
 
-  validates :turn, inclusion: { in: COLORS }
+  validates :time_control, presence: true
   validates :result, inclusion: { in: RESULTS }, allow_nil: true
   validates :end_reason, inclusion: { in: END_REASONS }, allow_nil: true
-  validates :draw_offered_by, inclusion: { in: COLORS }, allow_nil: true
-  validates :fen, presence: true
-  validates :initial_seconds, numericality: { only_integer: true, in: 60..10_800 }
-  validates :increment_seconds, numericality: { only_integer: true, in: 0..60 }
-  validates :white_seconds_left, :black_seconds_left, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-  validates :dice_a, :dice_b, :chosen_die, inclusion: { in: 1..6 }, allow_nil: true
   validate :player_present
-  validate :players_differ
+  validate :player_limit
   validate :opponent_present_once_started
-  validate :result_matches_status
-  validate :dice_come_in_pairs
-  validate :chosen_die_was_rolled
+  validate :result_matches_finish
 
-  def self.open_for(creator:, color: "random", random: Random, **settings)
+  def self.open_for(creator:, color: "random", random: Random, initial_seconds: 600, increment_seconds: 0, rated: true)
     color = COLORS[random.rand(2)] if color.to_s == "random"
     raise ArgumentError, "неизвестный цвет: #{color}" unless COLORS.include?(color.to_s)
 
-    create!(settings.merge("#{color}_player": creator))
+    game = new(time_control: TimeControl.lookup(initial_seconds, increment_seconds), rated: rated)
+    game.game_players.build(user: creator, color: color.to_s)
+    game.save!
+    game
   end
 
   def join!(user)
     raise Error, "партия уже началась" unless waiting?
     raise Error, "нельзя играть с самим собой" if participant?(user)
 
-    update!(free_seat => user, status: "active", started_at: Time.current)
-  end
-
-  def participant?(user)
-    color_of(user).present?
-  end
-
-  def color_of(user)
-    return if user.nil? || user.id.nil?
-
-    if user.id == white_player_id
-      "white"
-    elsif user.id == black_player_id
-      "black"
+    transaction do
+      game_players.create!(user: user, color: (COLORS - game_players.map(&:color)).first)
+      game_players.each { |player| player.update!(rating_before: player.user.rating) }
+      update!(started_at: Time.current)
     end
   end
 
+  def waiting?
+    started_at.nil?
+  end
+
+  def active?
+    started_at.present? && finished_at.nil?
+  end
+
+  def finished?
+    finished_at.present?
+  end
+
+  def status
+    if finished?
+      "finished"
+    elsif active?
+      "active"
+    else
+      "waiting"
+    end
+  end
+
+  def game_player_for(user)
+    return if user.nil? || user.id.nil?
+
+    game_players.find { |player| player.user_id == user.id }
+  end
+
+  def game_player_of(color)
+    game_players.find { |player| player.color == color }
+  end
+
+  def participant?(user)
+    game_player_for(user).present?
+  end
+
+  def color_of(user)
+    game_player_for(user)&.color
+  end
+
   def player_of(color)
-    color == "white" ? white_player : black_player
+    game_player_of(color)&.user
+  end
+
+  def white_player
+    player_of("white")
+  end
+
+  def black_player
+    player_of("black")
   end
 
   def opponent_of(user)
     color = color_of(user)
     player_of(opposite(color)) if color
+  end
+
+  def next_ply
+    moves.size + 1
+  end
+
+  def turn
+    moves.size.even? ? "white" : "black"
   end
 
   def current_player
@@ -84,73 +122,99 @@ class Game < ApplicationRecord
     active? && color_of(user) == turn
   end
 
+  def position
+    Position.replay(moves)
+  end
+
+  def fen
+    position.fen
+  end
+
   def seconds_left(color)
-    public_send("#{color}_seconds_left")
+    own_moves = moves.joins(:game_player).where(game_players: { color: color })
+    initial_seconds - own_moves.sum(:spent_seconds) + increment_seconds * own_moves.count
+  end
+
+  def current_roll
+    game_dice_states.find_by(ply: next_ply)
   end
 
   def dice_rolled?
-    dice_a.present? && dice_b.present?
+    current_roll.present?
   end
 
   def dice
-    dice_rolled? ? [ dice_a, dice_b ] : []
+    current_roll&.dice || []
+  end
+
+  def chosen_die
+    current_roll&.chosen_die
   end
 
   def allowed_piece
-    DICE_PIECES[chosen_die]
+    Game::DICE_PIECES[chosen_die]
   end
 
   def roll_dice!(user, random: Random)
     ensure_turn!(user)
     raise Error, "кубики уже брошены" if dice_rolled?
 
-    update!(dice_a: random.rand(1..6), dice_b: random.rand(1..6))
-    dice
+    dice_state = DiceState.lookup(random.rand(1..6), random.rand(1..6))
+    game_dice_states.create!(dice_state: dice_state, game_player: game_player_for(user), ply: next_ply)
+    dice_state.dice
   end
 
   def choose_die!(user, value)
     ensure_turn!(user)
-    raise Error, "сначала бросьте кубики" unless dice_rolled?
-    raise Error, "на кубиках нет значения #{value}" unless dice.include?(value)
+    roll = current_roll
+    raise Error, "сначала бросьте кубики" if roll.nil?
+    raise Error, "на кубиках нет значения #{value}" unless roll.dice_state.include?(value)
 
-    update!(chosen_die: value)
-    allowed_piece
+    roll.update!(chosen_die: value)
+    roll.piece
   end
 
-  def record_move!(user:, from:, to:, piece:, san:, fen_after:, captured: nil, spent_seconds: 0)
+  def record_move!(user:, from:, to:, piece:, san:, promotion: nil, spent_seconds: 0)
     ensure_turn!(user)
-    raise Error, "сначала бросьте кубики и выберите один из них" if chosen_die.nil?
+    roll = current_roll
+    raise Error, "сначала бросьте кубики и выберите один из них" if roll.nil? || !roll.chosen?
 
     color = turn
-    remaining = seconds_left(color) - spent_seconds
-    if remaining <= 0
+    if seconds_left(color) - spent_seconds <= 0
       timeout!(color)
       return
     end
 
-    transaction do
-      move = moves.create!(
-        player: user, ply: moves.count + 1, color: color, piece: piece, from_square: from, to_square: to,
-        san: san, captured: captured, die_a: dice_a, die_b: dice_b, die_used: chosen_die,
-        fen_after: fen_after, spent_seconds: spent_seconds
-      )
-      update!(
-        fen: fen_after, turn: opposite(color), dice_a: nil, dice_b: nil, chosen_die: nil, draw_offered_by: nil,
-        "#{color}_seconds_left" => remaining + increment_seconds
-      )
-      move
-    end
+    board = position
+    raise Error, "на #{from} нет вашей фигуры #{piece}" unless board.pieces[from] == "#{color[0]}#{piece}"
+    raise Error, "на #{to} стоит ваша фигура" if board.pieces[to]&.start_with?(color[0])
+
+    moves.create!(
+      game_player: roll.game_player, game_dice_state: roll, ply: next_ply, piece: piece, from_square: from,
+      to_square: to, promotion: promotion, captured: board.captured_piece(from: from, to: to), san: san,
+      spent_seconds: spent_seconds
+    )
+  end
+
+  def pending_draw_offer
+    draw_offers.where(ply: moves.size).order(:id).last
+  end
+
+  def draw_offered_by
+    pending_draw_offer&.game_player&.color
   end
 
   def offer_draw!(user)
     ensure_participant!(user)
-    update!(draw_offered_by: color_of(user))
+    draw_offers.find_or_create_by!(game_player: game_player_for(user), ply: moves.size)
   end
 
   def accept_draw!(user)
     ensure_participant!(user)
-    raise Error, "ничью никто не предлагал" if draw_offered_by.blank?
-    raise Error, "нельзя принять собственное предложение" if draw_offered_by == color_of(user)
+    me = game_player_for(user)
+    offers = draw_offers.where(ply: moves.size)
+    raise Error, "нельзя принять собственное предложение" if offers.where(game_player: me).exists? && !offers.where.not(game_player: me).exists?
+    raise Error, "ничью никто не предлагал" unless offers.where.not(game_player: me).exists?
 
     finish!(result: "draw", reason: "agreement")
   end
@@ -162,7 +226,6 @@ class Game < ApplicationRecord
 
   def timeout!(color)
     ensure_active!
-    update!("#{color}_seconds_left" => 0)
     finish!(result: "#{opposite(color)}_win", reason: "timeout")
   end
 
@@ -170,12 +233,9 @@ class Game < ApplicationRecord
     ensure_active!
 
     transaction do
-      assign_attributes(
-        status: "finished", result: result, end_reason: reason, finished_at: Time.current,
-        dice_a: nil, dice_b: nil, chosen_die: nil, draw_offered_by: nil
-      )
+      assign_attributes(result: result, end_reason: reason, finished_at: Time.current)
       validate!
-      assign_attributes(apply_rating_changes) if rated?
+      apply_rating_changes if rated?
       save!
     end
   end
@@ -206,15 +266,6 @@ class Game < ApplicationRecord
     color == "white" ? "black" : "white"
   end
 
-  def free_seat
-    white_player_id.nil? ? :white_player : :black_player
-  end
-
-  def start_clocks
-    self.white_seconds_left = initial_seconds
-    self.black_seconds_left = initial_seconds
-  end
-
   def ensure_active!
     raise Error, "партия не идёт" unless active?
   end
@@ -230,47 +281,35 @@ class Game < ApplicationRecord
   end
 
   def apply_rating_changes
+    white = game_player_of("white")
+    black = game_player_of("black")
     white_score = { "white_win" => 1.0, "black_win" => 0.0, "draw" => 0.5 }.fetch(result)
-    white_delta = EloRating.delta(white_player.rating, black_player.rating, white_score)
-    black_delta = EloRating.delta(black_player.rating, white_player.rating, 1 - white_score)
 
-    {
-      white_rating_delta: white_player.apply_rating_change!(white_delta),
-      black_rating_delta: black_player.apply_rating_change!(black_delta)
-    }
+    white_delta = EloRating.delta(white.rating_before, black.rating_before, white_score)
+    black_delta = EloRating.delta(black.rating_before, white.rating_before, 1 - white_score)
+
+    white.update!(rating_delta: white.user.apply_rating_change!(white_delta))
+    black.update!(rating_delta: black.user.apply_rating_change!(black_delta))
   end
 
   def player_present
-    errors.add(:base, :no_players) if white_player_id.nil? && black_player_id.nil?
+    errors.add(:base, :no_players) if game_players.empty?
   end
 
-  def players_differ
-    errors.add(:black_player, :same_as_white) if white_player_id.present? && white_player_id == black_player_id
+  def player_limit
+    errors.add(:base, :too_many_players) if game_players.size > 2
   end
 
   def opponent_present_once_started
-    return if waiting?
-
-    errors.add(:base, :opponent_missing) if white_player_id.nil? || black_player_id.nil?
+    errors.add(:base, :opponent_missing) if started_at.present? && game_players.size < 2
   end
 
-  def result_matches_status
-    if finished?
+  def result_matches_finish
+    if finished_at.present?
       errors.add(:result, :blank) if result.blank?
       errors.add(:end_reason, :blank) if end_reason.blank?
-    else
-      errors.add(:result, :present) if result.present?
+    elsif result.present?
+      errors.add(:result, :present)
     end
-  end
-
-  def dice_come_in_pairs
-    errors.add(:dice_b, :blank) if dice_a.present? && dice_b.blank?
-    errors.add(:dice_a, :blank) if dice_b.present? && dice_a.blank?
-  end
-
-  def chosen_die_was_rolled
-    return if chosen_die.nil? || dice.include?(chosen_die)
-
-    errors.add(:chosen_die, :not_rolled)
   end
 end

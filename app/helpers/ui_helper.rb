@@ -26,23 +26,7 @@ module UiHelper
   end
 
   def fen_pieces(fen)
-    pieces = {}
-
-    fen.split.first.split("/").each_with_index do |row, index|
-      file = 0
-
-      row.each_char do |char|
-        if char.match?(/\d/)
-          file += char.to_i
-        else
-          color = char == char.upcase ? "w" : "b"
-          pieces["#{FILES[file]}#{8 - index}"] = "#{color}#{char.downcase}"
-          file += 1
-        end
-      end
-    end
-
-    pieces
+    Position.from_placement(fen.split.first).pieces
   end
 
   def piece_label(piece)

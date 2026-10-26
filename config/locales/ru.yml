@@ -4,51 +4,66 @@ ru:
       user: Пользователь
       game: Партия
       move: Ход
+      time_control: Контроль времени
+      dice_state: Состояние кубиков
+      game_player: Игрок партии
     attributes:
       user:
         username: Никнейм
         password: Пароль
         rating: Рейтинг
       game:
-        white_player: Белые
-        black_player: Чёрные
-        status: Статус
         result: Результат
         end_reason: Причина окончания
-        turn: Очередь хода
+        time_control: Контроль времени
+      time_control:
         initial_seconds: Время на партию
         increment_seconds: Добавка за ход
-        dice_a: Первый кубик
-        dice_b: Второй кубик
+      dice_state:
+        first_die: Первый кубик
+        second_die: Второй кубик
+      game_dice_state:
+        ply: Номер хода
         chosen_die: Выбранный кубик
       move:
         ply: Номер хода
-        color: Цвет
         piece: Фигура
         from_square: Откуда
         to_square: Куда
-        die_used: Кубик
+        promotion: Превращение
     errors:
       messages:
         restrict_dependent_destroy:
           has_many: "Нельзя удалить запись, пока есть связанные записи (%{record})"
       models:
         game:
+          no_players: в партии должен быть хотя бы один игрок
+          too_many_players: в партии не может быть больше двух игроков
+          opponent_missing: для начатой партии нужны оба игрока
+        game_dice_state:
           attributes:
-            black_player:
-              same_as_white: не может быть тем же игроком, что и белые
+            game_player:
+              wrong_game: относится к другой партии
             chosen_die:
               not_rolled: не выпал на кубиках
-          no_players: в партии должен быть хотя бы один игрок
-          opponent_missing: для начатой партии нужны оба игрока
+        draw_offer:
+          attributes:
+            game_player:
+              wrong_game: относится к другой партии
         move:
           attributes:
             to_square:
               same_as_from: должна отличаться от клетки, откуда сделан ход
-            die_used:
-              not_rolled: не выпал на кубиках
             piece:
               does_not_match_die: не соответствует выбранному кубику
+            game_player:
+              wrong_game: относится к другой партии
+            game_dice_state:
+              wrong_game: относится к другой партии
+              other_player: бросок сделан другим игроком
+              no_chosen_die: кубик ещё не выбран
+            ply:
+              does_not_match_roll: не совпадает с номером броска
   errors:
     format: "%{attribute} %{message}"
     messages:

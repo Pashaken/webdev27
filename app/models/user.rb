@@ -3,11 +3,9 @@ class User < ApplicationRecord
 
   has_secure_password
 
-  has_many :games_as_white, class_name: "Game", foreign_key: :white_player_id,
-           inverse_of: :white_player, dependent: :restrict_with_error
-  has_many :games_as_black, class_name: "Game", foreign_key: :black_player_id,
-           inverse_of: :black_player, dependent: :restrict_with_error
-  has_many :moves, foreign_key: :player_id, inverse_of: :player, dependent: :restrict_with_error
+  has_many :game_players, dependent: :restrict_with_error, inverse_of: :user
+  has_many :games, through: :game_players
+  has_many :moves, through: :game_players
 
   normalizes :username, with: ->(username) { username.strip }
 
@@ -22,24 +20,20 @@ class User < ApplicationRecord
   validates :password, length: { minimum: 6 }, allow_nil: true
   validates :rating, numericality: { only_integer: true, greater_than_or_equal_to: MIN_RATING }
 
-  def games
-    Game.involving(self)
-  end
-
   def finished_games_count
-    games.finished.count
+    game_players.in_finished_games.count
   end
 
   def wins_count
-    games.finished.won_by(self).count
+    game_players.won.count
   end
 
   def losses_count
-    games.finished.lost_by(self).count
+    game_players.lost.count
   end
 
   def draws_count
-    games.finished.drawn.count
+    game_players.drawn.count
   end
 
   def win_rate

@@ -18,7 +18,8 @@
 ## База данных и модели
 
 Схема базы (ER-диаграмма, таблицы, правила): [docs/database.md](docs/database.md).
-Модели лежат в `app/models/`: `User`, `Game`, `Move` и `EloRating` (расчёт рейтинга).
+Модели лежат в `app/models/`: `User`, `Game`, `GamePlayer`, `Move`, `DiceState`, `GameDiceState`, `TimeControl`,
+`DrawOffer`, а также `Position` (позиция, которая восстанавливается из ходов) и `EloRating` (расчёт рейтинга).
 Миграции применяются командой `ruby bin/rails db:migrate`, тесты моделей запускаются командой
 `ruby bin/rails test test/models`.
 
