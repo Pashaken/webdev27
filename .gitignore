@@ -5,3 +5,4 @@
 !/tmp/.keep
 /config/master.key
 /.env*
+/certs

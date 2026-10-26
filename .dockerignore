@@ -8,3 +8,5 @@
 Dockerfile
 compose.yaml
 README.md
+/certs
+/nginx
