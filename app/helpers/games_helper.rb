@@ -22,6 +22,10 @@ module GamesHelper
     [ seat.user.username, seat.rating_before || seat.user.rating, player_path(seat.user) ] if seat
   end
 
+  def win_rate_text(rate)
+    rate ? "#{rate}%" : "—"
+  end
+
   def outcome_badge(outcome)
     OUTCOME_BADGES.fetch(outcome)
   end

@@ -41,7 +41,7 @@ class LeaderboardTest < ActionDispatch::IntegrationTest
 
     as(@alice) do
       get leaderboard_path
-      assert_equal %w[1 1516 2 1 0 1 50%], numbers("alice")
+      assert_equal %w[1 1516 2 1 0 1 100%], numbers("alice")
       assert_equal %w[2 1500 0 0 0 0 —], numbers("carol")
       assert_equal %w[3 1484 2 0 1 1 0%], numbers("bob")
     end

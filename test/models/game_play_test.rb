@@ -236,14 +236,14 @@ class GameLegalMovesTest < ActiveSupport::TestCase
     assert_equal %w[a3 c3], @game.legal_moves["b1"].sort
   end
 
-test "playable dice are the values whose piece can move" do
-  @game.roll_dice!(@alice, random: rigged(1, 6))
-  assert_equal [ 1 ], @game.playable_dice
+  test "playable dice are the values whose piece can move" do
+    @game.roll_dice!(@alice, random: rigged(1, 6))
+    assert_equal [ 1 ], @game.playable_dice
 
-  other = start_game(white: users(:carol), black: @bob)
-  other.roll_dice!(users(:carol), random: rigged(2, 2))
-  assert_equal [ 2 ], other.playable_dice
-end
+    other = start_game(white: users(:carol), black: @bob)
+    other.roll_dice!(users(:carol), random: rigged(2, 2))
+    assert_equal [ 2 ], other.playable_dice
+  end
 
   test "a roll without playable dice can be thrown again" do
     @game.roll_dice!(@alice, random: rigged(4, 6))

@@ -106,16 +106,33 @@ class UserStatisticsTest < ActiveSupport::TestCase
     assert_equal 0, @carol.losses_count
   end
 
-  test "win rate is a percentage of finished games" do
-    assert_equal 33, @alice.win_rate
+  test "win rate is the share of wins among won and lost games" do
+    assert_equal 50, @alice.win_rate
     assert_equal 0, @bob.win_rate
     assert_equal 100, @carol.win_rate
   end
 
-  test "win rate is zero without finished games" do
-    newcomer = User.create!(username: "newcomer", password: "secret123")
+  test "draws do not change the win rate" do
+    draws = start_game(white: @carol, black: @bob)
+    draws.offer_draw!(@carol)
+    draws.accept_draw!(@bob)
 
-    assert_equal 0, newcomer.win_rate
+    assert_equal 100, @carol.win_rate
+    assert_equal 0, @bob.win_rate
+    assert_equal 2, @carol.finished_games_count
+  end
+
+  test "there is no win rate without won or lost games" do
+    newcomer = User.create!(username: "newcomer", password: "secret123")
+    assert_nil newcomer.win_rate
+
+    game = start_game(white: newcomer, black: @carol)
+    game.offer_draw!(newcomer)
+    game.accept_draw!(@carol)
+
+    assert_nil newcomer.win_rate
+    assert_nil User.win_rate(0, 0)
+    assert_equal 67, User.win_rate(2, 1)
   end
 
   test "a user with games cannot be destroyed" do

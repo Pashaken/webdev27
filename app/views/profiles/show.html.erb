@@ -17,7 +17,7 @@
   <div class="stats">
     <% [ [ @user.finished_games_count, "Партии" ], [ @user.wins_count, "Победы" ],
          [ @user.losses_count, "Поражения" ], [ @user.draws_count, "Ничьи" ],
-         [ "#{@user.win_rate}%", "Процент побед" ], [ @user.rating, "Рейтинг" ] ].each do |value, label| %>
+         [ win_rate_text(@user.win_rate), "Процент побед" ], [ @user.rating, "Рейтинг" ] ].each do |value, label| %>
       <div class="stat">
         <span class="stat-value"><%= value %></span>
         <span class="stat-label"><%= label %></span>

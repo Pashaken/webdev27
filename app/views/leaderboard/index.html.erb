@@ -14,7 +14,7 @@
           <th class="num">Победы</th>
           <th class="num">Поражения</th>
           <th class="num">Ничьи</th>
-          <th class="num">Побед</th>
+          <th class="num" title="Победы / (победы + поражения), ничьи не считаются">Побед</th>
         </tr>
       </thead>
       <tbody>
@@ -34,7 +34,7 @@
             <td class="num"><%= wins %></td>
             <td class="num"><%= @losses.fetch(user.id, 0) %></td>
             <td class="num"><%= @draws.fetch(user.id, 0) %></td>
-            <td class="num"><%= games.zero? ? "—" : "#{(wins * 100.0 / games).round}%" %></td>
+            <td class="num"><%= win_rate_text(User.win_rate(wins, @losses.fetch(user.id, 0))) %></td>
           <% end %>
         <% end %>
       </tbody>

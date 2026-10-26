@@ -36,11 +36,13 @@ class User < ApplicationRecord
     game_players.drawn.count
   end
 
-  def win_rate
-    finished = finished_games_count
-    return 0 if finished.zero?
+  def self.win_rate(wins, losses)
+    decided = wins + losses
+    (wins * 100.0 / decided).round unless decided.zero?
+  end
 
-    (wins_count * 100.0 / finished).round
+  def win_rate
+    self.class.win_rate(wins_count, losses_count)
   end
 
   def apply_rating_change!(delta)

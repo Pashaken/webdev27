@@ -147,22 +147,22 @@ class PositionLegalMovesTest < ActiveSupport::TestCase
     assert_equal %w[d5 d6], black.moves_from("d7").sort
   end
 
-test "a pawn cannot jump over a piece with its double step" do
-  assert_empty position("8/8/8/8/8/4p3/4P3/8").moves_from("e2")
-  assert_equal %w[e3], position("8/8/8/8/4n3/8/4P3/8").moves_from("e2")
-end
+  test "a pawn cannot jump over a piece with its double step" do
+    assert_empty position("8/8/8/8/8/4p3/4P3/8").moves_from("e2")
+    assert_equal %w[e3], position("8/8/8/8/4n3/8/4P3/8").moves_from("e2")
+  end
 
-test "en passant is offered right after the double step" do
-  board = position("8/3p4/8/4P3/8/8/8/8")
-  assert_not_includes board.moves_from("e5"), "d6"
+  test "en passant is offered right after the double step" do
+    board = position("8/3p4/8/4P3/8/8/8/8")
+    assert_not_includes board.moves_from("e5"), "d6"
 
-  board.apply(from: "d7", to: "d5")
-  assert_equal "d6", board.en_passant
-  assert_includes board.moves_from("e5"), "d6"
+    board.apply(from: "d7", to: "d5")
+    assert_equal "d6", board.en_passant
+    assert_includes board.moves_from("e5"), "d6"
 
-  board.apply(from: "e5", to: "e6")
-  assert_nil board.en_passant
-end
+    board.apply(from: "e5", to: "e6")
+    assert_nil board.en_passant
+  end
 
   test "sliding pieces stop at the first piece and capture an enemy one" do
     board = position("8/8/8/8/3R2p1/8/3P4/8")
@@ -177,11 +177,11 @@ end
     assert_equal 27, position("8/8/8/8/3Q4/8/8/8").moves_from("d4").size
   end
 
-test "a knight jumps over pieces but cannot land on its own" do
-  assert_equal 8, position("8/8/8/8/3N4/8/8/8").moves_from("d4").size
-  assert_equal %w[c2], position("8/8/8/8/8/1P6/PP6/N7").moves_from("a1")
-  assert_equal %w[b3 c2], position("8/8/8/8/8/1p6/PP6/N7").moves_from("a1").sort
-end
+  test "a knight jumps over pieces but cannot land on its own" do
+    assert_equal 8, position("8/8/8/8/3N4/8/8/8").moves_from("d4").size
+    assert_equal %w[c2], position("8/8/8/8/8/1P6/PP6/N7").moves_from("a1")
+    assert_equal %w[b3 c2], position("8/8/8/8/8/1p6/PP6/N7").moves_from("a1").sort
+  end
 
   test "a king steps to any free or enemy square around it" do
     board = position("8/8/8/8/2pK4/2PP4/8/8")

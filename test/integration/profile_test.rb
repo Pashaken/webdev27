@@ -17,7 +17,7 @@ class ProfileTest < ActionDispatch::IntegrationTest
       assert_select "h1", "alice"
       assert_select ".badge-accent", "Рейтинг 1500"
       assert_equal "0", stat("Партии")
-      assert_equal "0%", stat("Процент побед")
+      assert_equal "—", stat("Процент побед")
       assert_equal "1500", stat("Рейтинг")
       assert_select ".profile-section", /Завершённых партий пока нет/
       assert_select "table", 0
@@ -72,6 +72,7 @@ class ProfileTest < ActionDispatch::IntegrationTest
       assert_equal "2", stat("Партии")
       assert_equal "1", stat("Ничьи")
       assert_equal "1", stat("Поражения")
+      assert_equal "0%", stat("Процент побед")
       assert_select "tbody .badge-warning", "Ничья"
       assert_select "tbody td.num", "не рейтинговая"
     end
