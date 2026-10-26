@@ -1,11 +1,17 @@
+<% action_class = "btn btn-primary btn-sm" %>
+
 <article class="game-card">
   <div class="game-card-players">
     <% [ [ "w", white ], [ "b", black ] ].each do |color, (name, rating)| %>
       <div class="game-card-player">
         <%= tag.span class: "piece-icon", data: { piece: "#{color}k" }, aria: { label: color == "w" ? "Белые" : "Чёрные" } %>
-        <span class="avatar avatar-sm"><%= name.first.upcase %></span>
-        <span><%= name %></span>
-        <span class="muted"><%= rating %></span>
+        <% if name %>
+          <span class="avatar avatar-sm"><%= name.first.upcase %></span>
+          <span><%= name %></span>
+          <span class="muted"><%= rating %></span>
+        <% else %>
+          <span class="muted">Свободно</span>
+        <% end %>
       </div>
     <% end %>
   </div>
@@ -13,7 +19,16 @@
   <div class="game-card-meta">
     <span class="badge"><%= control %></span>
     <span class="badge badge-accent">Два кубика</span>
+    <% if local_assigns[:badge] %>
+      <span class="badge"><%= badge %></span>
+    <% end %>
   </div>
 
-  <%= tag.button action, type: "button", class: "btn btn-primary btn-sm" %>
+  <% if local_assigns[:url] && local_assigns[:http_method] == :post %>
+    <%= button_to action, url, class: action_class %>
+  <% elsif local_assigns[:url] %>
+    <%= link_to action, url, class: action_class %>
+  <% else %>
+    <%= tag.button action, type: "button", class: action_class %>
+  <% end %>
 </article>

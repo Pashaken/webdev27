@@ -1,0 +1,21 @@
+<div class="dice-tray">
+  <% if roll %>
+    <% roll.dice.each do |value| %>
+      <%= render "ui/die", value: value, piece: "#{game.turn[0]}#{Game::DICE_PIECES[value]}",
+                           state: (roll.chosen_die == value ? :selected : (mine && playable.exclude?(value) ? :blocked : nil)),
+                           url: (choose_game_path(game) if mine) %>
+    <% end %>
+  <% elsif mine %>
+    <%= button_to roll_game_path(game), class: "btn btn-primary" do %>
+      <span class="icon icon-dice" aria-hidden="true"></span> Бросить кубики
+    <% end %>
+  <% else %>
+    <p class="muted">Соперник ещё не бросил кубики.</p>
+  <% end %>
+</div>
+
+<% if mine && roll && playable.empty? %>
+  <%= button_to reroll_game_path(game), class: "btn btn-secondary btn-block" do %>
+    <span class="icon icon-refresh" aria-hidden="true"></span> Ходов нет, бросить заново
+  <% end %>
+<% end %>

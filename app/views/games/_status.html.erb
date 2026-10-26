@@ -1,0 +1,43 @@
+<% opponent_offered = me && game.active? && game.draw_offered_by.present? && game.draw_offered_by != me.color %>
+
+<% if game.finished? %>
+  <% if me %>
+    <%= render "ui/result", outcome: game.outcome_for(current_user).to_sym, reason: result_reason(game, current_user),
+                            delta: rating_change(game, current_user), open: true, lobby_url: root_path %>
+  <% else %>
+    <div class="alert alert-info">
+      <%= result_summary(game) %>. <%= result_reason(game, current_user) %>.
+      <%= link_to "В лобби", root_path %>
+    </div>
+  <% end %>
+<% elsif game.waiting? %>
+  <% if me %>
+    <div class="alert alert-info">Ждём соперника. Партия начнётся, как только он присоединится.</div>
+  <% else %>
+    <div class="alert alert-info">Партия ждёт соперника.</div>
+    <%= button_to "Присоединиться", join_game_path(game), class: "btn btn-primary btn-block" %>
+  <% end %>
+<% elsif me.nil? %>
+  <div class="alert alert-info">Вы наблюдаете за партией.</div>
+<% else %>
+  <% if opponent_offered %>
+    <div class="alert alert-warning">
+      <p>Соперник предлагает ничью.</p>
+      <%= button_to "Принять ничью", accept_draw_game_path(game), class: "btn btn-secondary btn-sm" %>
+    </div>
+  <% end %>
+
+  <% if !mine %>
+    <div class="alert alert-info">Ход соперника. Страница обновляется сама.</div>
+  <% elsif roll.nil? %>
+    <div class="alert alert-info">Ваш ход: бросьте кубики.</div>
+  <% elsif playable.empty? %>
+    <div class="alert alert-warning">Ни одной фигурой нельзя сходить. Бросьте кубики заново.</div>
+  <% elsif roll.chosen_die.nil? %>
+    <div class="alert alert-info">Выберите кубик: его значение определяет фигуру.</div>
+  <% else %>
+    <div class="alert alert-info">
+      Ходите: <%= piece_label("#{me.color[0]}#{roll.piece}").downcase %>. Нажмите на фигуру, затем на поле.
+    </div>
+  <% end %>
+<% end %>

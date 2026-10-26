@@ -217,3 +217,195 @@ class GameClockTest < ActiveSupport::TestCase
     assert_equal users(:alice), @game.winner
   end
 end
+
+class GameLegalMovesTest < ActiveSupport::TestCase
+  setup do
+    @alice = users(:alice)
+    @bob = users(:bob)
+    @game = start_game(white: @alice, black: @bob)
+  end
+
+  test "legal moves depend on the chosen die" do
+    assert_empty @game.legal_moves
+
+    @game.roll_dice!(@alice, random: rigged(1, 2))
+    assert_empty @game.legal_moves
+
+    @game.choose_die!(@alice, 2)
+    assert_equal %w[b1 g1], @game.legal_moves.keys.sort
+    assert_equal %w[a3 c3], @game.legal_moves["b1"].sort
+  end
+
+test "playable dice are the values whose piece can move" do
+  @game.roll_dice!(@alice, random: rigged(1, 6))
+  assert_equal [ 1 ], @game.playable_dice
+
+  other = start_game(white: users(:carol), black: @bob)
+  other.roll_dice!(users(:carol), random: rigged(2, 2))
+  assert_equal [ 2 ], other.playable_dice
+end
+
+  test "a roll without playable dice can be thrown again" do
+    @game.roll_dice!(@alice, random: rigged(4, 6))
+    assert_empty @game.playable_dice
+
+    assert_equal [ 1, 3 ], @game.reroll!(@alice, random: rigged(1, 3))
+    assert_equal [ 1, 3 ], @game.dice
+    assert_equal 1, @game.game_dice_states.count
+  end
+
+  test "a roll with playable dice cannot be thrown again" do
+    @game.roll_dice!(@alice, random: rigged(1, 6))
+
+    assert_raises(Game::Error) { @game.reroll!(@alice, random: rigged(1, 1)) }
+    assert_equal [ 1, 6 ], @game.dice
+  end
+
+  test "rolling again needs a roll and the right player" do
+    assert_raises(Game::Error) { @game.reroll!(@alice) }
+
+    @game.roll_dice!(@alice, random: rigged(4, 6))
+    assert_raises(Game::Error) { @game.reroll!(@bob) }
+  end
+
+  test "play_move! uses the chosen piece, writes the notation and promotes to a queen" do
+    @game.roll_dice!(@alice, random: rigged(1, 2))
+    @game.choose_die!(@alice, 1)
+    move = @game.play_move!(user: @alice, from: "e2", to: "e4")
+
+    assert_equal "e4", move.san
+    assert_equal "p", move.piece
+    assert_equal "black", @game.turn
+    assert_equal "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1", @game.fen
+  end
+
+  test "play_move! rejects moves that do not follow the rules or the die" do
+    assert_raises(Game::Error) { @game.play_move!(user: @alice, from: "e2", to: "e4") }
+
+    @game.roll_dice!(@alice, random: rigged(1, 2))
+    assert_raises(Game::Error) { @game.play_move!(user: @alice, from: "e2", to: "e4") }
+
+    @game.choose_die!(@alice, 1)
+    assert_raises(Game::Error) { @game.play_move!(user: @alice, from: "e2", to: "e5") }
+    assert_raises(Game::Error) { @game.play_move!(user: @alice, from: "b1", to: "c3") }
+    assert_raises(Game::Error) { @game.play_move!(user: @alice, from: "e7", to: "e6") }
+    assert_raises(Game::Error) { @game.play_move!(user: @bob, from: "e2", to: "e4") }
+    assert_empty @game.moves
+  end
+
+  test "a pawn reaching the last rank becomes a queen" do
+    game = start_game(white: users(:carol), black: @bob)
+    plan = [
+      [ "carol", "a2", "a4" ], [ "bob", "b7", "b5" ], [ "carol", "a4", "b5" ], [ "bob", "a7", "a6" ],
+      [ "carol", "b5", "a6" ], [ "bob", "g8", "f6" ], [ "carol", "a6", "a7" ], [ "bob", "f6", "g8" ],
+      [ "carol", "a7", "b8" ]
+    ]
+
+    plan.each do |name, from, to|
+      user = users(name.to_sym)
+      piece = game.position.pieces[from][1]
+      die = Game::DICE_PIECES.key(piece)
+      game.roll_dice!(user, random: rigged(die, die))
+      game.choose_die!(user, die)
+      game.play_move!(user: user, from: from, to: to)
+    end
+
+    last = game.moves.last
+    assert_equal "q", last.promotion
+    assert_equal "axb8=Q", last.san
+    assert_equal "n", last.captured
+    assert_equal "wq", game.position.pieces["b8"]
+  end
+
+  test "capturing the king ends the game with a win" do
+    plan = [
+      [ @alice, "f2", "f3" ], [ @bob, "e7", "e5" ], [ @alice, "g2", "g4" ],
+      [ @bob, "d8", "h4" ], [ @alice, "a2", "a3" ]
+    ]
+    plan.each do |user, from, to|
+      piece = @game.position.pieces[from][1]
+      die = Game::DICE_PIECES.key(piece)
+      @game.roll_dice!(user, random: rigged(die, die))
+      @game.choose_die!(user, die)
+      @game.play_move!(user: user, from: from, to: to)
+    end
+    assert_predicate @game, :active?
+
+    @game.roll_dice!(@bob, random: rigged(5, 5))
+    @game.choose_die!(@bob, 5)
+    move = @game.play_move!(user: @bob, from: "h4", to: "e1")
+
+    assert_equal "k", move.captured
+    assert_predicate @game, :finished?
+    assert_equal "black_win", @game.result
+    assert_equal "king_captured", @game.end_reason
+    assert_equal @bob, @game.winner
+    assert_equal 16, @bob.reload.rating - 1500
+  end
+end
+
+class GameRunningClockTest < ActiveSupport::TestCase
+  setup do
+    @alice = users(:alice)
+    @bob = users(:bob)
+    @game = start_game(white: @alice, black: @bob, initial_seconds: 300)
+    @game.update!(started_at: Time.utc(2026, 10, 27, 12))
+  end
+
+  test "thinking time counts from the start of the game or the last move" do
+    travel_to @game.started_at + 40.seconds do
+      assert_equal 40, @game.thinking_seconds
+      assert_equal 260, @game.clock_left("white")
+      assert_equal 300, @game.clock_left("black")
+    end
+  end
+
+  test "the clock of the player who just moved stops and the other one starts" do
+    travel_to @game.started_at + 10.seconds do
+      @game.roll_dice!(@alice, random: rigged(1, 2))
+      @game.choose_die!(@alice, 1)
+      @game.play_move!(user: @alice, from: "e2", to: "e4")
+    end
+
+    travel_to @game.started_at + 25.seconds do
+      assert_equal 290, @game.clock_left("white")
+      assert_equal 285, @game.clock_left("black")
+      assert_equal 15, @game.thinking_seconds
+    end
+  end
+
+  test "the spent time of a move is saved" do
+    travel_to @game.started_at + 12.seconds do
+      @game.roll_dice!(@alice, random: rigged(1, 2))
+      @game.choose_die!(@alice, 1)
+      @game.play_move!(user: @alice, from: "e2", to: "e4")
+    end
+
+    assert_equal 12, @game.moves.last.spent_seconds
+  end
+
+  test "an expired clock ends the game when it is checked" do
+    travel_to @game.started_at + 299.seconds do
+      @game.expire_clock!
+      assert_predicate @game, :active?
+    end
+
+    travel_to @game.started_at + 301.seconds do
+      @game.expire_clock!
+    end
+
+    assert_predicate @game, :finished?
+    assert_equal "black_win", @game.result
+    assert_equal "timeout", @game.end_reason
+  end
+
+  test "a finished or waiting game has no running clock" do
+    waiting = Game.open_for(creator: @alice, color: "white")
+    assert_equal 0, waiting.thinking_seconds
+    assert_nil waiting.expire_clock!
+
+    @game.resign!(@alice)
+    assert_equal 0, @game.thinking_seconds
+    assert_nil @game.expire_clock!
+  end
+end

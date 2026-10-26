@@ -1,6 +1,7 @@
 <% prefix = local_assigns.fetch(:prefix, "create") %>
+<% controls = local_assigns.fetch(:controls, TimeControl::PRESETS) %>
 
-<form class="card" action="#" method="get">
+<%= form_with url: local_assigns.fetch(:url, "#"), method: local_assigns.fetch(:http_method, :get), class: "card" do %>
   <h3 class="card-title">Новая партия</h3>
 
   <fieldset class="fieldset">
@@ -24,15 +25,15 @@
   <div class="field">
     <label class="label" for="<%= prefix %>-control">Контроль времени</label>
     <select class="input" id="<%= prefix %>-control" name="control">
-      <option>5 минут</option>
-      <option selected>10 минут</option>
-      <option>15 + 10</option>
+      <% controls.each do |label, value| %>
+        <%= tag.option label, value: value, selected: value == TimeControl::DEFAULT_PRESET %>
+      <% end %>
     </select>
   </div>
 
   <div class="field">
     <label class="switch">
-      <input type="checkbox" name="rated" checked>
+      <input type="checkbox" name="rated" value="1" checked>
       <span class="switch-track"></span>
       Рейтинговая партия
     </label>
@@ -41,4 +42,4 @@
   <button class="btn btn-primary btn-block" type="submit">
     <span class="icon icon-plus" aria-hidden="true"></span> Создать партию
   </button>
-</form>
+<% end %>

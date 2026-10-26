@@ -551,3 +551,60 @@ button.die:hover:not(:disabled) {
     font-size: var(--text-lg);
   }
 }
+
+.square-hit,
+.square-form {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+}
+
+.square-hit {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.die-form {
+  margin: 0;
+}
+
+.game-side .dialog {
+  position: static;
+  width: auto;
+  margin: 0;
+}
+
+.game-controls form {
+  display: contents;
+}
+
+.lobby {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.lobby-main,
+.lobby-section {
+  display: grid;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.lobby-title {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+@media (max-width: 860px) {
+  .lobby {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -113,3 +113,114 @@ class PositionReplayTest < ActiveSupport::TestCase
     assert_equal game.fen, Game.find(game.id).fen
   end
 end
+
+class PositionLegalMovesTest < ActiveSupport::TestCase
+  def position(placement)
+    Position.from_placement(placement)
+  end
+
+  test "pawns and knights are the only pieces that can move from the start position" do
+    start = Position.start
+
+    assert_equal %w[e3 e4], start.moves_from("e2")
+    assert_equal %w[a3 c3], start.moves_from("b1").sort
+    assert_empty start.moves_from("c1")
+    assert_empty start.moves_from("a1")
+    assert_empty start.moves_from("d1")
+    assert_empty start.moves_from("e1")
+    assert_empty start.moves_from("e4")
+
+    assert_equal 8, start.moves_for("white", "p").size
+    assert_equal %w[b1 g1], start.moves_for("white", "n").keys.sort
+    assert_empty start.moves_for("white", "k")
+    assert_empty start.moves_for("black", "q")
+  end
+
+  test "a pawn is blocked by any piece in front and captures diagonally only" do
+    blocked = position("8/8/8/8/3p4/3P4/8/8")
+    assert_empty blocked.moves_from("d3")
+
+    capturing = position("8/8/8/2p1p3/3P4/8/8/8")
+    assert_equal %w[c5 d5 e5], capturing.moves_from("d4").sort
+
+    black = position("8/3p4/8/8/8/8/8/8")
+    assert_equal %w[d5 d6], black.moves_from("d7").sort
+  end
+
+test "a pawn cannot jump over a piece with its double step" do
+  assert_empty position("8/8/8/8/8/4p3/4P3/8").moves_from("e2")
+  assert_equal %w[e3], position("8/8/8/8/4n3/8/4P3/8").moves_from("e2")
+end
+
+test "en passant is offered right after the double step" do
+  board = position("8/3p4/8/4P3/8/8/8/8")
+  assert_not_includes board.moves_from("e5"), "d6"
+
+  board.apply(from: "d7", to: "d5")
+  assert_equal "d6", board.en_passant
+  assert_includes board.moves_from("e5"), "d6"
+
+  board.apply(from: "e5", to: "e6")
+  assert_nil board.en_passant
+end
+
+  test "sliding pieces stop at the first piece and capture an enemy one" do
+    board = position("8/8/8/8/3R2p1/8/3P4/8")
+
+    assert_equal %w[a4 b4 c4 d3 d5 d6 d7 d8 e4 f4 g4].sort, board.moves_from("d4").sort
+
+    bishop = position("8/8/5p2/8/3B4/8/1P6/8")
+    assert_equal %w[c3 c5 b6 a7 e3 f2 g1 e5 f6].sort, bishop.moves_from("d4").sort
+  end
+
+  test "a queen moves like a rook and a bishop together" do
+    assert_equal 27, position("8/8/8/8/3Q4/8/8/8").moves_from("d4").size
+  end
+
+test "a knight jumps over pieces but cannot land on its own" do
+  assert_equal 8, position("8/8/8/8/3N4/8/8/8").moves_from("d4").size
+  assert_equal %w[c2], position("8/8/8/8/8/1P6/PP6/N7").moves_from("a1")
+  assert_equal %w[b3 c2], position("8/8/8/8/8/1p6/PP6/N7").moves_from("a1").sort
+end
+
+  test "a king steps to any free or enemy square around it" do
+    board = position("8/8/8/2ppp3/2pKp3/2PPP3/8/8")
+
+    assert_equal %w[c5 d5 e5 c4 e4].sort, board.moves_from("d4").sort
+  end
+
+  test "castling is offered when the way is free and the rights are kept" do
+    board = position("r3k2r/8/8/8/8/8/8/R3K2R")
+
+    assert_includes board.moves_from("e1"), "g1"
+    assert_includes board.moves_from("e1"), "c1"
+
+    board.apply(from: "e1", to: "g1")
+    assert_equal "R4RK1", board.placement.split("/").last
+  end
+
+  test "castling is not offered through pieces, without a rook or after the rights are gone" do
+    assert_not_includes position("8/8/8/8/8/8/8/R2QK2R").moves_from("e1"), "c1"
+    assert_includes position("8/8/8/8/8/8/8/R2QK2R").moves_from("e1"), "g1"
+    assert_not_includes position("8/8/8/8/8/8/8/4K1NR").moves_from("e1"), "g1"
+    assert_not_includes position("8/8/8/8/8/8/8/4K3").moves_from("e1"), "g1"
+
+    moved = position("r3k2r/8/8/8/8/8/8/R3K2R").apply(from: "h1", to: "h2").apply(from: "h8", to: "h7")
+    assert_not_includes moved.moves_from("e1"), "g1"
+    assert_includes moved.moves_from("e1"), "c1"
+  end
+
+  test "a simple notation is built from the position before the move" do
+    start = Position.start
+    assert_equal "e4", start.simple_san(from: "e2", to: "e4")
+    assert_equal "Nf3", start.simple_san(from: "g1", to: "f3")
+
+    capture = position("8/8/8/3p4/4P3/8/8/8")
+    assert_equal "exd5", capture.simple_san(from: "e4", to: "d5")
+
+    assert_equal "Bxb7", position("8/1p6/8/8/4B3/8/8/8").simple_san(from: "e4", to: "b7")
+    assert_equal "e8=Q", position("8/4P3/8/8/8/8/8/8").simple_san(from: "e7", to: "e8", promotion: "q")
+    assert_equal "O-O", position("8/8/8/8/8/8/8/4K2R").simple_san(from: "e1", to: "g1")
+    assert_equal "O-O-O", position("8/8/8/8/8/8/8/R3K3").simple_san(from: "e1", to: "c1")
+  end
+end

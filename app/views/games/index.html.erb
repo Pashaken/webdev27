@@ -1,0 +1,53 @@
+<% content_for :title, "DiceChess — Лобби" %>
+
+<div class="lobby">
+  <%= render "ui/create_game_form", prefix: "lobby", url: games_path, http_method: :post %>
+
+  <div class="lobby-main">
+    <section class="lobby-section">
+      <h1 class="lobby-title">Мои партии</h1>
+
+      <% if @running.empty? %>
+        <p class="muted">Активных партий нет. Создайте новую или присоединитесь к открытой.</p>
+      <% else %>
+        <div class="game-list">
+          <% @running.each do |game| %>
+            <%= render "ui/game_card", white: lobby_player(game, "white"), black: lobby_player(game, "black"),
+                                       control: game.time_control.label, badge: (game.rated? ? "Рейтинговая" : "Без рейтинга"),
+                                       action: (game.waiting? ? "Открыть" : "Продолжить"), url: game_path(game) %>
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="lobby-section">
+      <h2 class="lobby-title">Открытые партии</h2>
+
+      <% if @open.empty? %>
+        <p class="muted">Сейчас никто не ждёт соперника.</p>
+      <% else %>
+        <div class="game-list">
+          <% @open.each do |game| %>
+            <%= render "ui/game_card", white: lobby_player(game, "white"), black: lobby_player(game, "black"),
+                                       control: game.time_control.label, badge: (game.rated? ? "Рейтинговая" : "Без рейтинга"),
+                                       action: "Играть", url: join_game_path(game), http_method: :post %>
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+
+    <% if @finished.any? %>
+      <section class="lobby-section">
+        <h2 class="lobby-title">Недавние партии</h2>
+
+        <div class="game-list">
+          <% @finished.each do |game| %>
+            <%= render "ui/game_card", white: lobby_player(game, "white"), black: lobby_player(game, "black"),
+                                       control: game.time_control.label, badge: result_summary(game),
+                                       action: "Посмотреть", url: game_path(game) %>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+  </div>
+</div>

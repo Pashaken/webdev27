@@ -3,7 +3,7 @@ class Game < ApplicationRecord
 
   COLORS = %w[white black].freeze
   RESULTS = %w[white_win black_win draw].freeze
-  END_REASONS = %w[checkmate resignation timeout stalemate agreement].freeze
+  END_REASONS = %w[checkmate resignation timeout stalemate agreement king_captured].freeze
   DICE_PIECES = { 1 => "p", 2 => "n", 3 => "b", 4 => "r", 5 => "q", 6 => "k" }.freeze
 
   belongs_to :time_control
@@ -13,6 +13,8 @@ class Game < ApplicationRecord
   has_many :draw_offers, dependent: :destroy, inverse_of: :game
   has_many :game_players, dependent: :destroy, inverse_of: :game
   has_many :users, through: :game_players
+
+  cattr_accessor :dice_source, default: Random, instance_accessor: false
 
   delegate :initial_seconds, :increment_seconds, to: :time_control
 
@@ -135,6 +137,21 @@ class Game < ApplicationRecord
     initial_seconds - own_moves.sum(:spent_seconds) + increment_seconds * own_moves.count
   end
 
+  def thinking_seconds(now = Time.current)
+    return 0 unless active?
+
+    [ (now - (moves.last&.created_at || started_at)).to_i, 0 ].max
+  end
+
+  def clock_left(color, now = Time.current)
+    left = seconds_left(color)
+    active? && color == turn ? left - thinking_seconds(now) : left
+  end
+
+  def expire_clock!
+    timeout!(turn) if active? && clock_left(turn) <= 0
+  end
+
   def current_roll
     game_dice_states.find_by(ply: next_ply)
   end
@@ -155,7 +172,16 @@ class Game < ApplicationRecord
     Game::DICE_PIECES[chosen_die]
   end
 
-  def roll_dice!(user, random: Random)
+  def legal_moves(board = position)
+    piece = allowed_piece
+    piece ? board.moves_for(turn, piece) : {}
+  end
+
+  def playable_dice(board = position)
+    dice.uniq.select { |value| board.moves_for(turn, DICE_PIECES[value]).any? }
+  end
+
+  def roll_dice!(user, random: self.class.dice_source)
     ensure_turn!(user)
     raise Error, "кубики уже брошены" if dice_rolled?
 
@@ -174,6 +200,33 @@ class Game < ApplicationRecord
     roll.piece
   end
 
+  def reroll!(user, random: self.class.dice_source)
+    ensure_turn!(user)
+    roll = current_roll
+    raise Error, "сначала бросьте кубики" if roll.nil?
+    raise Error, "есть доступные ходы" if playable_dice.any?
+
+    transaction do
+      roll.destroy!
+      roll_dice!(user, random: random)
+    end
+  end
+
+  def play_move!(user:, from:, to:)
+    ensure_turn!(user)
+    piece = allowed_piece
+    raise Error, "сначала выберите кубик" if piece.nil?
+
+    board = position
+    raise Error, "так ходить нельзя" unless board.moves_for(turn, piece)[from]&.include?(to)
+
+    promotion = "q" if piece == "p" && %w[1 8].include?(to[1])
+    record_move!(
+      user: user, from: from, to: to, piece: piece, promotion: promotion,
+      san: board.simple_san(from: from, to: to, promotion: promotion), spent_seconds: thinking_seconds
+    )
+  end
+
   def record_move!(user:, from:, to:, piece:, san:, promotion: nil, spent_seconds: 0)
     ensure_turn!(user)
     roll = current_roll
@@ -189,11 +242,13 @@ class Game < ApplicationRecord
     raise Error, "на #{from} нет вашей фигуры #{piece}" unless board.pieces[from] == "#{color[0]}#{piece}"
     raise Error, "на #{to} стоит ваша фигура" if board.pieces[to]&.start_with?(color[0])
 
-    moves.create!(
+    move = moves.create!(
       game_player: roll.game_player, game_dice_state: roll, ply: next_ply, piece: piece, from_square: from,
       to_square: to, promotion: promotion, captured: board.captured_piece(from: from, to: to), san: san,
       spent_seconds: spent_seconds
     )
+    finish!(result: "#{color}_win", reason: "king_captured") if move.captured == "k"
+    move
   end
 
   def pending_draw_offer

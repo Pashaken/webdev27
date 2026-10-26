@@ -9,7 +9,11 @@
   <% end %>
 
   <div class="dialog-actions">
-    <button class="btn btn-ghost" type="button">В лобби</button>
-    <button class="btn btn-primary" type="button"><span class="icon icon-refresh" aria-hidden="true"></span> Реванш</button>
+    <% if local_assigns[:lobby_url] %>
+      <%= link_to "В лобби", lobby_url, class: "btn btn-primary" %>
+    <% else %>
+      <button class="btn btn-ghost" type="button">В лобби</button>
+      <button class="btn btn-primary" type="button"><span class="icon icon-refresh" aria-hidden="true"></span> Реванш</button>
+    <% end %>
   </div>
 <% end %>

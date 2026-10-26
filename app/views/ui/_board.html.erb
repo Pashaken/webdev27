@@ -1,6 +1,7 @@
 <% flipped = local_assigns.fetch(:flipped, false) %>
 <% pieces = local_assigns.fetch(:pieces, {}) %>
 <% marks = local_assigns.fetch(:marks, {}) %>
+<% actions = local_assigns.fetch(:actions, {}) %>
 
 <div class="board" role="group" aria-label="Шахматная доска">
   <% board_squares(flipped: flipped).each do |square| %>
@@ -13,6 +14,15 @@
       <% if (piece = pieces[square]) %>
         <%= tag.span class: [ "piece", ("is-dragging" if square_marks.include?(:dragging)), ("is-draggable" if square_marks.include?(:draggable)) ],
                      data: { piece: piece }, role: "img", aria: { label: piece_label(piece) } %>
+      <% end %>
+
+      <% if (action = actions[square]) %>
+        <% if action[:method] == :post %>
+          <%= button_to "", action[:url], params: action[:params], class: "square-hit", form_class: "square-form",
+                                          aria: { label: action[:label] } %>
+        <% else %>
+          <%= link_to "", action[:url], class: "square-hit", aria: { label: action[:label] } %>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>

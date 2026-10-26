@@ -1,11 +1,18 @@
 <% state = local_assigns[:state] %>
+<% die_class = [ "die", ("is-#{state}" if state) ] %>
 
 <div class="die-slot">
-  <%= tag.button "", type: "button",
-                 class: [ "die", ("is-#{state}" if state) ],
-                 data: { value: value },
-                 disabled: state == :blocked,
-                 aria: { pressed: state == :selected, label: "Кубик: #{value}" } %>
+  <% if local_assigns[:url] %>
+    <%= button_to "", local_assigns[:url], params: { die: value }, class: die_class, form_class: "die-form",
+                                           data: { value: value }, disabled: state == :blocked,
+                                           aria: { pressed: state == :selected, label: "Кубик: #{value}" } %>
+  <% else %>
+    <%= tag.button "", type: "button",
+                   class: die_class,
+                   data: { value: value },
+                   disabled: state == :blocked,
+                   aria: { pressed: state == :selected, label: "Кубик: #{value}" } %>
+  <% end %>
 
   <% if local_assigns[:piece] %>
     <span class="die-caption">

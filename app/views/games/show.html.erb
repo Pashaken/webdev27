@@ -1,0 +1,45 @@
+<% content_for :title, "DiceChess — Партия №#{@game.id}" %>
+<% content_for(:head) { tag.meta("http-equiv": "refresh", content: 3) } if @refresh %>
+
+<% me = @game.game_player_for(current_user) %>
+<% bottom = me ? me.color : "white" %>
+<% top = bottom == "white" ? "black" : "white" %>
+
+<div class="game">
+  <div class="game-main">
+    <%= render "games/player", game: @game, color: top, moves: @moves %>
+
+    <%= render "ui/board", pieces: @position.pieces, flipped: bottom == "black",
+                           marks: board_marks(@moves, @legal, @selected, @position),
+                           actions: board_actions(@game, @legal, @selected) %>
+
+    <%= render "games/player", game: @game, color: bottom, moves: @moves %>
+
+    <% if @game.active? %>
+      <%= render "games/dice", game: @game, roll: @roll, mine: @mine, playable: @playable %>
+    <% end %>
+  </div>
+
+  <aside class="game-side">
+    <%= render "games/status", game: @game, me: me, roll: @roll, mine: @mine, playable: @playable %>
+
+    <%= render "ui/moves", moves: @moves.map { |move| [ move.san, move.die_used ] },
+                           current: (@moves.empty? ? nil : [ (@moves.size + 1) / 2, (@moves.size - 1) % 2 ]) %>
+
+    <% if me && @game.active? %>
+      <div class="game-controls">
+        <% if @game.draw_offered_by == me.color %>
+          <button class="btn btn-ghost" type="button" disabled>Ничья предложена</button>
+        <% else %>
+          <%= button_to offer_draw_game_path(@game), class: "btn btn-ghost" do %>
+            <span class="icon icon-equal" aria-hidden="true"></span> Ничья
+          <% end %>
+        <% end %>
+
+        <%= button_to resign_game_path(@game), class: "btn btn-danger" do %>
+          <span class="icon icon-flag" aria-hidden="true"></span> Сдаться
+        <% end %>
+      </div>
+    <% end %>
+  </aside>
+</div>

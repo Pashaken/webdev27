@@ -1,4 +1,4 @@
-ActiveRecord::Schema[8.1].define(version: 2026_10_26_120700) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_120000) do
   enable_extension "pg_catalog.plpgsql"
 
   create_table "dice_states", force: :cascade do |t|
@@ -59,7 +59,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_26_120700) do
     t.datetime "updated_at", null: false
     t.index ["time_control_id"], name: "index_games_on_time_control_id"
     t.check_constraint "(finished_at IS NULL) = (result IS NULL) AND (finished_at IS NULL) = (end_reason IS NULL)", name: "games_finish_check"
-    t.check_constraint "end_reason::text = ANY (ARRAY['checkmate'::character varying, 'resignation'::character varying, 'timeout'::character varying, 'stalemate'::character varying, 'agreement'::character varying]::text[])", name: "games_end_reason_check"
+    t.check_constraint "end_reason::text = ANY (ARRAY['checkmate'::character varying, 'resignation'::character varying, 'timeout'::character varying, 'stalemate'::character varying, 'agreement'::character varying, 'king_captured'::character varying]::text[])", name: "games_end_reason_check"
     t.check_constraint "finished_at IS NULL OR started_at IS NOT NULL", name: "games_started_check"
     t.check_constraint "result::text = ANY (ARRAY['white_win'::character varying, 'black_win'::character varying, 'draw'::character varying]::text[])", name: "games_result_check"
   end

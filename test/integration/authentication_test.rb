@@ -36,7 +36,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
     follow_redirect!
     assert_response :success
-    assert_select "h1", "Привет, dave!"
+    assert_select ".nav-user", "dave"
   end
 
   test "registration with invalid data shows errors and creates nothing" do
@@ -60,7 +60,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
 
     follow_redirect!
-    assert_select "h1", "Привет, alice!"
+    assert_select ".nav-user", "alice"
   end
 
   test "login with wrong password or unknown nickname fails with the same message" do

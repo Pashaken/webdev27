@@ -1,4 +1,7 @@
 class TimeControl < ApplicationRecord
+  PRESETS = [ [ "5 минут", "300+0" ], [ "10 минут", "600+0" ], [ "15 + 10", "900+10" ] ].freeze
+  DEFAULT_PRESET = "600+0".freeze
+
   has_many :games, dependent: :restrict_with_error
 
   validates :initial_seconds, numericality: { only_integer: true, in: 60..10_800 },
