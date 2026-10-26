@@ -31,7 +31,13 @@ class GamesController < ApplicationController
     @legal = @mine ? @game.legal_moves(@position) : {}
     @check = @mine && @position.in_check?(@game.turn)
     @selected = params[:from] if @legal.key?(params[:from])
-    @refresh = !@game.finished? && !@mine
+    @poll = !@game.finished?
+    @version = @game.change_token
+  end
+
+  def state
+    @game.expire_clock!
+    render json: { version: @game.change_token }
   end
 
   def destroy

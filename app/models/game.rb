@@ -260,6 +260,11 @@ class Game < ApplicationRecord
     move
   end
 
+  def change_token
+    roll = current_roll
+    [ status, game_players.size, moves.count, roll&.id, roll&.chosen_die, draw_offered_by ].join("-")
+  end
+
   def pending_draw_offer
     draw_offers.where(ply: moves.size).order(:id).last
   end

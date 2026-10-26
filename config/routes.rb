@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   resources :games, only: %i[create show destroy] do
     member do
+      get :state
       %i[join roll choose reroll move resign offer_draw accept_draw].each { |action| post action }
     end
   end

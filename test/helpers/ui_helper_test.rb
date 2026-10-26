@@ -47,7 +47,7 @@ class UiAssetHelperTest < ActionView::TestCase
   end
 
   test "every file the layout links to exists" do
-    %w[tokens.css base.css components.css icons.css game.css theme.js clock.js].each do |name|
+    %w[tokens.css base.css components.css icons.css game.css theme.js clock.js poll.js].each do |name|
       assert Rails.public_path.join("ui", name).file?, "нет файла #{name}"
       assert_match %r{\A/ui/#{Regexp.escape(name)}\?v=\d+\z}, ui_asset(name)
     end

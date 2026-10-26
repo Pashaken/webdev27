@@ -1,11 +1,10 @@
 <% content_for :title, "DiceChess — Партия №#{@game.id}" %>
-<% content_for(:head) { tag.meta("http-equiv": "refresh", content: 3) } if @refresh %>
 
 <% me = @game.game_player_for(current_user) %>
 <% bottom = me ? me.color : "white" %>
 <% top = bottom == "white" ? "black" : "white" %>
 
-<div class="game">
+<%= tag.div class: "game", data: { poll_url: (state_game_path(@game) if @poll), version: @version } do %>
   <div class="game-main">
     <%= render "games/player", game: @game, color: top, moves: @moves %>
 
@@ -44,4 +43,4 @@
       <%= link_to "В лобби", root_path, class: "btn btn-ghost btn-block" %>
     <% end %>
   </aside>
-</div>
+<% end %>

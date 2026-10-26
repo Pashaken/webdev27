@@ -25,7 +25,7 @@ class HappyPathTest < ActionDispatch::IntegrationTest
       follow_redirect!
       assert_response :success
       assert_select ".alert", /Ждём соперника/
-      assert_select "meta[http-equiv=refresh]"
+      assert_select ".game[data-poll-url=?]", state_game_path(game)
       assert_select "form[action=?]", roll_game_path(game), count: 0
     end
 
@@ -38,7 +38,7 @@ class HappyPathTest < ActionDispatch::IntegrationTest
       follow_redirect!
       assert_response :success
       assert_select ".alert", /Ход соперника/
-      assert_select "meta[http-equiv=refresh]"
+      assert_select ".game[data-poll-url=?]", state_game_path(game)
       assert_select ".board .square", 64
     end
 
@@ -49,7 +49,7 @@ class HappyPathTest < ActionDispatch::IntegrationTest
     as(@alice) do
       get game_path(game)
       assert_select ".alert", /бросьте кубики/
-      assert_select "meta[http-equiv=refresh]", count: 0
+      assert_select ".game[data-poll-url=?]", state_game_path(game)
       assert_select ".clock.is-running[data-seconds]", 1
       assert_select ".clock:not(.is-running)[data-seconds]", 0
       post roll_game_path(game)
