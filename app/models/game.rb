@@ -256,7 +256,7 @@ class Game < ApplicationRecord
       to_square: to, promotion: promotion, captured: board.captured_piece(from: from, to: to), san: san,
       spent_seconds: spent_seconds
     )
-    finish_if_over!(color)
+    finish_after!(move, color)
     move
   end
 
@@ -335,14 +335,10 @@ class Game < ApplicationRecord
     color == "white" ? "black" : "white"
   end
 
-  def finish_if_over!(mover)
-    opponent = opposite(mover)
-    board = position
-    return if board.any_moves?(opponent)
-
-    if board.in_check?(opponent)
-      finish!(result: "#{mover}_win", reason: "checkmate")
-    else
+  def finish_after!(move, mover)
+    if move.captured == "k"
+      finish!(result: "#{mover}_win", reason: "king_captured")
+    elsif !position.any_moves?(opposite(mover))
       finish!(result: "draw", reason: "stalemate")
     end
   end

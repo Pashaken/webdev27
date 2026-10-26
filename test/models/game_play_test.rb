@@ -310,59 +310,39 @@ end
     assert_equal "wq", game.position.pieces["b8"]
   end
 
-  test "a checkmate ends the game with a win" do
+  test "capturing the king ends the game with a win" do
     play_move(@game, @alice, "f2", "f3")
     play_move(@game, @bob, "e7", "e5")
     play_move(@game, @alice, "g2", "g4")
+    play_move(@game, @bob, "d8", "h4")
     assert_predicate @game, :active?
 
-    move = play_move(@game, @bob, "d8", "h4")
+    play_move(@game, @alice, "a2", "a3")
+    move = play_move(@game, @bob, "h4", "e1")
 
-    assert_equal "Qh4", move.san
+    assert_equal "Qxe1", move.san
+    assert_equal "k", move.captured
     assert_predicate @game, :finished?
     assert_equal "black_win", @game.result
-    assert_equal "checkmate", @game.end_reason
+    assert_equal "king_captured", @game.end_reason
     assert_equal @bob, @game.winner
     assert_equal 1516, @bob.reload.rating
     assert_equal 1484, @alice.reload.rating
   end
 
-  test "an ordinary check does not end the game" do
+  test "a player under attack may play any move" do
     play_move(@game, @alice, "f2", "f3")
     play_move(@game, @bob, "e7", "e5")
     play_move(@game, @alice, "e1", "f2", die: 6)
     play_move(@game, @bob, "d8", "h4")
-
-    assert_predicate @game, :active?
     assert @game.position.in_check?("white")
-  end
-
-  test "a move that leaves the own king in check is rejected" do
-    play_move(@game, @alice, "f2", "f3")
-    play_move(@game, @bob, "e7", "e5")
-    play_move(@game, @alice, "e1", "f2", die: 6)
-    play_move(@game, @bob, "d8", "h4")
 
     @game.roll_dice!(@alice, random: rigged(1, 1))
     @game.choose_die!(@alice, 1)
 
-    assert_equal %w[g2], @game.legal_moves.keys
-    assert_equal %w[g3], @game.legal_moves["g2"]
-    assert_raises(Game::Error) { @game.play_move!(user: @alice, from: "a2", to: "a3") }
-    assert_equal "g3", @game.play_move!(user: @alice, from: "g2", to: "g3").to_square
-  end
-
-  test "dice that cannot save the king have to be rolled again" do
-    play_move(@game, @alice, "f2", "f3")
-    play_move(@game, @bob, "e7", "e5")
-    play_move(@game, @alice, "e1", "f2", die: 6)
-    play_move(@game, @bob, "d8", "h4")
-
-    @game.roll_dice!(@alice, random: rigged(2, 2))
-    assert_empty @game.playable_dice
-
-    assert_equal [ 1, 3 ], @game.reroll!(@alice, random: rigged(1, 3))
-    assert_equal [ 1 ], @game.playable_dice
+    assert_equal 8, @game.legal_moves.size
+    assert_equal "a3", @game.play_move!(user: @alice, from: "a2", to: "a3").to_square
+    assert_predicate @game, :active?
   end
 end
 

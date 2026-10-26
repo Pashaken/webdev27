@@ -145,61 +145,62 @@ class HappyPathTest < ActionDispatch::IntegrationTest
     assert_equal "draw", game.reload.result
   end
 
-  test "a game ends with a checkmate" do
-    game = start_game
+test "a game ends when the king is captured" do
+  game = start_game
 
-    take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "f2", to: "f3")
-    take_turn(@bob, game, dice: [ 1, 4 ], die: 1, from: "e7", to: "e5")
-    take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "g2", to: "g4")
-    take_turn(@bob, game, dice: [ 5, 4 ], die: 5, from: "d8", to: "h4")
+  take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "f2", to: "f3")
+  take_turn(@bob, game, dice: [ 1, 4 ], die: 1, from: "e7", to: "e5")
+  take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "g2", to: "g4")
+  take_turn(@bob, game, dice: [ 5, 4 ], die: 5, from: "d8", to: "h4")
+  assert_predicate game.reload, :active?
 
-    assert_predicate game.reload, :finished?
-    assert_equal "black_win", game.result
-    assert_equal "checkmate", game.end_reason
+  take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "a2", to: "a3")
+  take_turn(@bob, game, dice: [ 5, 4 ], die: 5, from: "h4", to: "e1")
 
-    as(@alice) do
-      get game_path(game)
-      assert_select ".result-loss .result-title", "Поражение"
-      assert_select ".result-reason", "Мат"
-      assert_select ".square.is-check[data-square='e1']"
-    end
+  assert_predicate game.reload, :finished?
+  assert_equal "black_win", game.result
+  assert_equal "king_captured", game.end_reason
 
-    as(@bob) do
-      get game_path(game)
-      assert_select ".result-win .result-title", "Победа"
-    end
+  as(@alice) do
+    get game_path(game)
+    assert_select ".result-loss .result-title", "Поражение"
+    assert_select ".result-reason", "Король взят"
   end
 
-  test "a player in check can only play moves that save the king" do
-    game = start_game
-
-    take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "f2", to: "f3")
-    take_turn(@bob, game, dice: [ 1, 4 ], die: 1, from: "e7", to: "e5")
-    take_turn(@alice, game, dice: [ 6, 6 ], die: 6, from: "e1", to: "f2")
-    take_turn(@bob, game, dice: [ 5, 4 ], die: 5, from: "d8", to: "h4")
-    assert_predicate game.reload, :active?
-
-    rig_dice(1, 1)
-    as(@alice) do
-      get game_path(game)
-      assert_select ".square.is-check[data-square='f2']"
-      assert_select ".alert-warning", /Вам шах/
-
-      post roll_game_path(game)
-      post choose_game_path(game), params: { die: 1 }
-      follow_redirect!
-      assert_select ".square.is-clickable", 1
-      assert_select ".square.is-clickable[data-square='g2']"
-
-      post move_game_path(game), params: { from: "a2", to: "a3" }
-      follow_redirect!
-      assert_select ".alert-error", /так ходить нельзя/
-
-      get game_path(game, from: "g2")
-      assert_select ".square.is-target", 1
-      assert_select "form[action=?] input[name=to][value=g3]", move_game_path(game)
-    end
+  as(@bob) do
+    get game_path(game)
+    assert_select ".result-win .result-title", "Победа"
   end
+end
+
+test "a player under attack is warned but may play any move" do
+  game = start_game
+
+  take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "f2", to: "f3")
+  take_turn(@bob, game, dice: [ 1, 4 ], die: 1, from: "e7", to: "e5")
+  take_turn(@alice, game, dice: [ 6, 6 ], die: 6, from: "e1", to: "f2")
+  take_turn(@bob, game, dice: [ 5, 4 ], die: 5, from: "d8", to: "h4")
+  assert_predicate game.reload, :active?
+
+  rig_dice(1, 1)
+  as(@alice) do
+    get game_path(game)
+    assert_select ".square.is-check[data-square='f2']"
+    assert_select ".alert-warning", /король под боем/
+
+    post roll_game_path(game)
+    post choose_game_path(game), params: { die: 1 }
+    follow_redirect!
+    assert_select ".square.is-clickable", 8
+
+    post move_game_path(game), params: { from: "a2", to: "a3" }
+    follow_redirect!
+    assert_select ".alert-error", 0
+    assert_select ".move", /a3/
+  end
+
+  assert_predicate game.reload, :active?
+end
 
   test "a creator can leave a waiting game for the lobby or cancel it" do
     as(@alice) { post games_path, params: { color: "white", control: "600+0" } }

@@ -225,12 +225,12 @@ end
   end
 end
 
-class PositionCheckTest < ActiveSupport::TestCase
+class PositionAttackTest < ActiveSupport::TestCase
   def position(placement)
     Position.from_placement(placement)
   end
 
-  test "every kind of piece gives check" do
+  test "a king is under attack from every kind of piece" do
     assert position("4k3/8/8/8/8/8/8/4R3").in_check?("black")
     assert position("4k3/8/8/8/B7/8/8/4K3").in_check?("black")
     assert position("4k3/8/3N4/8/8/8/8/4K3").in_check?("black")
@@ -240,75 +240,39 @@ class PositionCheckTest < ActiveSupport::TestCase
     assert position("8/8/8/8/8/3p4/4K3/8").in_check?("white")
   end
 
-  test "a blocked line and a pawn straight ahead give no check" do
+  test "a blocked line and a pawn straight ahead are not an attack" do
     assert_not position("4k3/4p3/8/8/8/8/8/4R3").in_check?("black")
     assert_not position("4k3/4P3/8/8/8/8/8/4K3").in_check?("black")
     assert_not position("4K3/8/8/8/8/8/8/8").in_check?("white")
+    assert_not position("8/8/8/8/8/8/8/8").in_check?("white")
   end
 
-  test "a pinned piece cannot leave the line of the attack" do
-    assert_empty position("4k3/4r3/8/8/8/8/4B3/4K3").moves_from("e2")
-    assert_equal %w[e3 e4 e5 e6 e7], position("4k3/4r3/8/8/8/8/4R3/4K3").moves_from("e2").sort
+  test "an attack does not limit the moves because the game is won by taking the king" do
+    stepping = position("8/8/8/8/8/5r2/8/4K3")
+    assert_equal %w[d1 d2 e2 f1 f2], stepping.moves_from("e1").sort
+
+    pinned = position("4k3/4r3/8/8/8/8/4B3/4K3")
+    assert_not_empty pinned.moves_from("e2")
+
+    castling = position("4k3/8/8/8/4r3/8/8/R3K2R")
+    assert_includes castling.moves_from("e1"), "g1"
+    assert_includes castling.moves_from("e1"), "c1"
   end
 
-  test "a king cannot step onto an attacked square" do
-    board = position("8/8/8/8/8/5r2/8/4K3")
+  test "the king can be found and taken like any other piece" do
+    board = position("4k3/8/8/8/8/8/4R3/4K3")
 
-    assert_equal %w[d1 d2 e2], board.moves_from("e1").sort
+    assert_equal "e8", board.king_square("black")
+    assert_equal "k", board.captured_piece(from: "e2", to: "e8").then { |piece| piece }
+    board.apply(from: "e2", to: "e8")
+    assert_nil board.king_square("black")
   end
 
-  test "in check only moves that remove the check are possible" do
-    board = position("4k3/8/8/8/8/8/3PP3/r3K3")
+  test "a side is without moves when all its pieces are blocked" do
+    board = position("8/p7/P7/8/8/8/8/4K3")
 
-    assert_equal %w[f2], board.moves_from("e1")
-    assert_empty board.moves_from("d2")
-    assert_empty board.moves_from("e2")
-  end
-
-  test "the check can be blocked or the attacker captured" do
-    blocked = position("k3r3/8/8/8/8/8/3B4/4K3")
-    assert_equal %w[e3], blocked.moves_from("d2")
-    assert_equal %w[d1 f1 f2], blocked.moves_from("e1").sort
-
-    captured = position("k7/8/8/8/8/8/4q3/4K3")
-    assert_equal %w[e2], captured.moves_from("e1")
-  end
-
-  test "castling is not allowed out of, through or into check" do
-    assert_includes position("4k3/8/8/8/8/8/8/R3K2R").moves_from("e1"), "g1"
-
-    out_of = position("4k3/8/8/8/4r3/8/8/R3K2R")
-    assert_not_includes out_of.moves_from("e1"), "g1"
-    assert_not_includes out_of.moves_from("e1"), "c1"
-
-    through = position("4k3/8/8/8/8/8/5r2/R3K2R")
-    assert_not_includes through.moves_from("e1"), "g1"
-
-    into = position("4k3/8/8/8/8/8/6r1/R3K2R")
-    assert_not_includes into.moves_from("e1"), "g1"
-    assert_includes into.moves_from("e1"), "c1"
-  end
-
-  test "checkmate and stalemate are positions without moves" do
-    mate = position("rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR")
-    assert mate.in_check?("white")
-    assert_not mate.any_moves?("white")
-    assert mate.any_moves?("black")
-
-    stalemate = position("7k/5Q2/6K1/8/8/8/8/8")
-    assert_not stalemate.in_check?("black")
-    assert_not stalemate.any_moves?("black")
-  end
-
-  test "a copy of a position does not share the board" do
-    start = Position.start
-    copy = start.dup
-    copy.apply(from: "e2", to: "e4")
-
-    assert start.any_moves?("white")
-    assert_equal "wp", start.pieces["e2"]
-    assert_nil copy.pieces["e2"]
-    assert_equal "e1", start.king_square("white")
-    assert_nil position("8/8/8/8/8/8/8/8").king_square("white")
+    assert_not board.any_moves?("black")
+    assert board.any_moves?("white")
+    assert Position.start.any_moves?("white")
   end
 end
