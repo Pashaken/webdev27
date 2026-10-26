@@ -14,5 +14,6 @@
     </div>
   <% end %>
 
-  <%= tag.div clock, class: [ "clock", ("is-running" if local_assigns[:active]), ("is-low" if local_assigns[:low]) ] %>
+  <%= tag.div clock, class: [ "clock", ("is-running" if local_assigns[:active]), ("is-low" if local_assigns[:low]) ],
+                      data: { seconds: local_assigns[:seconds] } %>
 <% end %>

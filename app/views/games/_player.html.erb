@@ -1,9 +1,11 @@
 <% seat = game.game_player_of(color) %>
 <% left = game.clock_left(color) %>
+<% running = game.active? && game.turn == color %>
 
 <%= render "ui/player", name: seat&.user&.username || "Ждём соперника",
                         rating: seat ? (seat.rating_before || seat.user.rating) : "—",
                         clock: clock_text(left),
-                        active: game.active? && game.turn == color,
+                        active: running,
+                        seconds: (left if running),
                         low: game.active? && left < 30,
                         captured: captured_by(moves, color) %>

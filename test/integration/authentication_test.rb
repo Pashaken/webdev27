@@ -13,6 +13,8 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
   test "registration and login pages render forms" do
     get register_path
     assert_response :success
+    assert_select "link[rel=stylesheet][href^=?]", "/ui/game.css?v="
+    assert_select "script[src^=?]", "/ui/theme.js?v="
     assert_select "form[action=?]", register_path
     assert_select "input[name=?]", "user[username]"
     assert_select "input[type=password][name=?]", "user[password]"

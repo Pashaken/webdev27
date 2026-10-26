@@ -13,18 +13,28 @@
 <% elsif game.waiting? %>
   <% if me %>
     <div class="alert alert-info">Ждём соперника. Партия начнётся, как только он присоединится.</div>
+    <div class="game-controls">
+      <%= link_to "В лобби", root_path, class: "btn btn-ghost" %>
+      <%= button_to "Отменить", game_path(game), method: :delete, class: "btn btn-danger" %>
+    </div>
   <% else %>
     <div class="alert alert-info">Партия ждёт соперника.</div>
     <%= button_to "Присоединиться", join_game_path(game), class: "btn btn-primary btn-block" %>
+    <%= link_to "В лобби", root_path, class: "btn btn-ghost btn-block" %>
   <% end %>
 <% elsif me.nil? %>
   <div class="alert alert-info">Вы наблюдаете за партией.</div>
+  <%= link_to "В лобби", root_path, class: "btn btn-ghost btn-block" %>
 <% else %>
   <% if opponent_offered %>
     <div class="alert alert-warning">
       <p>Соперник предлагает ничью.</p>
       <%= button_to "Принять ничью", accept_draw_game_path(game), class: "btn btn-secondary btn-sm" %>
     </div>
+  <% end %>
+
+  <% if mine && check %>
+    <div class="alert alert-warning">Вам шах: нужно защитить короля.</div>
   <% end %>
 
   <% if !mine %>

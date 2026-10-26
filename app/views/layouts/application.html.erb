@@ -7,12 +7,13 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="apple-touch-icon" href="/icon.png">
-    <script src="/ui/theme.js"></script>
-    <link rel="stylesheet" href="/ui/tokens.css">
-    <link rel="stylesheet" href="/ui/base.css">
-    <link rel="stylesheet" href="/ui/components.css">
-    <link rel="stylesheet" href="/ui/icons.css">
-    <link rel="stylesheet" href="/ui/game.css">
+    <script src="<%= ui_asset("theme.js") %>"></script>
+    <script src="<%= ui_asset("clock.js") %>" defer></script>
+    <link rel="stylesheet" href="<%= ui_asset("tokens.css") %>">
+    <link rel="stylesheet" href="<%= ui_asset("base.css") %>">
+    <link rel="stylesheet" href="<%= ui_asset("components.css") %>">
+    <link rel="stylesheet" href="<%= ui_asset("icons.css") %>">
+    <link rel="stylesheet" href="<%= ui_asset("game.css") %>">
     <%= yield :head %>
   </head>
 

@@ -21,7 +21,7 @@
   </div>
 
   <aside class="game-side">
-    <%= render "games/status", game: @game, me: me, roll: @roll, mine: @mine, playable: @playable %>
+    <%= render "games/status", game: @game, me: me, roll: @roll, mine: @mine, playable: @playable, check: @check %>
 
     <%= render "ui/moves", moves: @moves.map { |move| [ move.san, move.die_used ] },
                            current: (@moves.empty? ? nil : [ (@moves.size + 1) / 2, (@moves.size - 1) % 2 ]) %>
@@ -40,6 +40,8 @@
           <span class="icon icon-flag" aria-hidden="true"></span> Сдаться
         <% end %>
       </div>
+
+      <%= link_to "В лобби", root_path, class: "btn btn-ghost btn-block" %>
     <% end %>
   </aside>
 </div>

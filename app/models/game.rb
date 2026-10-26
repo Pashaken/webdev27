@@ -51,6 +51,13 @@ class Game < ApplicationRecord
     end
   end
 
+  def cancel!(user)
+    raise Error, "отменить можно только партию, которая ждёт соперника" unless waiting?
+    raise Error, "вы не участвуете в этой партии" unless participant?(user)
+
+    destroy!
+  end
+
   def waiting?
     started_at.nil?
   end
@@ -144,6 +151,8 @@ class Game < ApplicationRecord
   end
 
   def clock_left(color, now = Time.current)
+    return 0 if end_reason == "timeout" && result == "#{opposite(color)}_win"
+
     left = seconds_left(color)
     active? && color == turn ? left - thinking_seconds(now) : left
   end
@@ -247,7 +256,7 @@ class Game < ApplicationRecord
       to_square: to, promotion: promotion, captured: board.captured_piece(from: from, to: to), san: san,
       spent_seconds: spent_seconds
     )
-    finish!(result: "#{color}_win", reason: "king_captured") if move.captured == "k"
+    finish_if_over!(color)
     move
   end
 
@@ -319,6 +328,18 @@ class Game < ApplicationRecord
 
   def opposite(color)
     color == "white" ? "black" : "white"
+  end
+
+  def finish_if_over!(mover)
+    opponent = opposite(mover)
+    board = position
+    return if board.any_moves?(opponent)
+
+    if board.in_check?(opponent)
+      finish!(result: "#{mover}_win", reason: "checkmate")
+    else
+      finish!(result: "draw", reason: "stalemate")
+    end
   end
 
   def ensure_active!

@@ -54,6 +54,8 @@ module GamesHelper
       marks[move.to_square] << :last_move
     end
 
+    marks[position.king_square(position.turn)] << :check if position.in_check?(position.turn)
+
     legal.each_key { |square| marks[square] << :clickable }
 
     if selected

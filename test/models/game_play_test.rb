@@ -301,14 +301,7 @@ end
       [ "carol", "a7", "b8" ]
     ]
 
-    plan.each do |name, from, to|
-      user = users(name.to_sym)
-      piece = game.position.pieces[from][1]
-      die = Game::DICE_PIECES.key(piece)
-      game.roll_dice!(user, random: rigged(die, die))
-      game.choose_die!(user, die)
-      game.play_move!(user: user, from: from, to: to)
-    end
+    plan.each { |name, from, to| play_move(game, users(name.to_sym), from, to) }
 
     last = game.moves.last
     assert_equal "q", last.promotion
@@ -317,30 +310,88 @@ end
     assert_equal "wq", game.position.pieces["b8"]
   end
 
-  test "capturing the king ends the game with a win" do
-    plan = [
-      [ @alice, "f2", "f3" ], [ @bob, "e7", "e5" ], [ @alice, "g2", "g4" ],
-      [ @bob, "d8", "h4" ], [ @alice, "a2", "a3" ]
-    ]
-    plan.each do |user, from, to|
-      piece = @game.position.pieces[from][1]
-      die = Game::DICE_PIECES.key(piece)
-      @game.roll_dice!(user, random: rigged(die, die))
-      @game.choose_die!(user, die)
-      @game.play_move!(user: user, from: from, to: to)
-    end
+  test "a checkmate ends the game with a win" do
+    play_move(@game, @alice, "f2", "f3")
+    play_move(@game, @bob, "e7", "e5")
+    play_move(@game, @alice, "g2", "g4")
     assert_predicate @game, :active?
 
-    @game.roll_dice!(@bob, random: rigged(5, 5))
-    @game.choose_die!(@bob, 5)
-    move = @game.play_move!(user: @bob, from: "h4", to: "e1")
+    move = play_move(@game, @bob, "d8", "h4")
 
-    assert_equal "k", move.captured
+    assert_equal "Qh4", move.san
     assert_predicate @game, :finished?
     assert_equal "black_win", @game.result
-    assert_equal "king_captured", @game.end_reason
+    assert_equal "checkmate", @game.end_reason
     assert_equal @bob, @game.winner
-    assert_equal 16, @bob.reload.rating - 1500
+    assert_equal 1516, @bob.reload.rating
+    assert_equal 1484, @alice.reload.rating
+  end
+
+  test "an ordinary check does not end the game" do
+    play_move(@game, @alice, "f2", "f3")
+    play_move(@game, @bob, "e7", "e5")
+    play_move(@game, @alice, "e1", "f2", die: 6)
+    play_move(@game, @bob, "d8", "h4")
+
+    assert_predicate @game, :active?
+    assert @game.position.in_check?("white")
+  end
+
+  test "a move that leaves the own king in check is rejected" do
+    play_move(@game, @alice, "f2", "f3")
+    play_move(@game, @bob, "e7", "e5")
+    play_move(@game, @alice, "e1", "f2", die: 6)
+    play_move(@game, @bob, "d8", "h4")
+
+    @game.roll_dice!(@alice, random: rigged(1, 1))
+    @game.choose_die!(@alice, 1)
+
+    assert_equal %w[g2], @game.legal_moves.keys
+    assert_equal %w[g3], @game.legal_moves["g2"]
+    assert_raises(Game::Error) { @game.play_move!(user: @alice, from: "a2", to: "a3") }
+    assert_equal "g3", @game.play_move!(user: @alice, from: "g2", to: "g3").to_square
+  end
+
+  test "dice that cannot save the king have to be rolled again" do
+    play_move(@game, @alice, "f2", "f3")
+    play_move(@game, @bob, "e7", "e5")
+    play_move(@game, @alice, "e1", "f2", die: 6)
+    play_move(@game, @bob, "d8", "h4")
+
+    @game.roll_dice!(@alice, random: rigged(2, 2))
+    assert_empty @game.playable_dice
+
+    assert_equal [ 1, 3 ], @game.reroll!(@alice, random: rigged(1, 3))
+    assert_equal [ 1 ], @game.playable_dice
+  end
+end
+
+class GameCancelTest < ActiveSupport::TestCase
+  setup do
+    @alice = users(:alice)
+  end
+
+  test "the creator can cancel a game that waits for an opponent" do
+    game = Game.open_for(creator: @alice, color: "white")
+
+    assert_difference [ "Game.count", "GamePlayer.count" ], -1 do
+      game.cancel!(@alice)
+    end
+    assert_not Game.exists?(game.id)
+  end
+
+  test "someone else cannot cancel the game" do
+    game = Game.open_for(creator: @alice, color: "white")
+
+    assert_raises(Game::Error) { game.cancel!(users(:bob)) }
+    assert Game.exists?(game.id)
+  end
+
+  test "a game that has started cannot be cancelled" do
+    game = start_game(white: @alice, black: users(:bob))
+
+    assert_raises(Game::Error) { game.cancel!(@alice) }
+    assert Game.exists?(game.id)
   end
 end
 
@@ -397,6 +448,8 @@ class GameRunningClockTest < ActiveSupport::TestCase
     assert_predicate @game, :finished?
     assert_equal "black_win", @game.result
     assert_equal "timeout", @game.end_reason
+    assert_equal 0, @game.clock_left("white")
+    assert_equal 300, @game.clock_left("black")
   end
 
   test "a finished or waiting game has no running clock" do

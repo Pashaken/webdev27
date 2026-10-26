@@ -36,3 +36,20 @@ class UiHelperTest < ActionView::TestCase
     end
   end
 end
+
+class UiAssetHelperTest < ActionView::TestCase
+  tests UiHelper
+
+  test "ui_asset adds the modification time of the file as a version" do
+    path = Rails.public_path.join("ui", "game.css")
+
+    assert_equal "/ui/game.css?v=#{path.mtime.to_i}", ui_asset("game.css")
+  end
+
+  test "every file the layout links to exists" do
+    %w[tokens.css base.css components.css icons.css game.css theme.js clock.js].each do |name|
+      assert Rails.public_path.join("ui", name).file?, "нет файла #{name}"
+      assert_match %r{\A/ui/#{Regexp.escape(name)}\?v=\d+\z}, ui_asset(name)
+    end
+  end
+end

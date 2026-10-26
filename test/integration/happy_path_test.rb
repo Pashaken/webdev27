@@ -50,6 +50,8 @@ class HappyPathTest < ActionDispatch::IntegrationTest
       get game_path(game)
       assert_select ".alert", /бросьте кубики/
       assert_select "meta[http-equiv=refresh]", count: 0
+      assert_select ".clock.is-running[data-seconds]", 1
+      assert_select ".clock:not(.is-running)[data-seconds]", 0
       post roll_game_path(game)
       follow_redirect!
       assert_select ".alert", /Выберите кубик/
@@ -79,6 +81,12 @@ class HappyPathTest < ActionDispatch::IntegrationTest
       get game_path(game)
       assert_select ".alert", /бросьте кубики/
       assert_select ".square[data-square='e4'] .piece[data-piece='wp']"
+    end
+
+    as(@alice) do
+      get game_path(game)
+      assert_select ".clock.is-running[data-seconds]", 1
+      assert_select ".player-panel.is-active .player-name", "bob"
     end
 
     take_turn(@bob, game, dice: [ 2, 6 ], die: 2, from: "g8", to: "f6")
@@ -137,25 +145,110 @@ class HappyPathTest < ActionDispatch::IntegrationTest
     assert_equal "draw", game.reload.result
   end
 
-  test "a game can end by capturing the king" do
+  test "a game ends with a checkmate" do
     game = start_game
 
     take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "f2", to: "f3")
     take_turn(@bob, game, dice: [ 1, 4 ], die: 1, from: "e7", to: "e5")
     take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "g2", to: "g4")
     take_turn(@bob, game, dice: [ 5, 4 ], die: 5, from: "d8", to: "h4")
-    take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "a2", to: "a3")
-    take_turn(@bob, game, dice: [ 5, 4 ], die: 5, from: "h4", to: "e1")
 
     assert_predicate game.reload, :finished?
     assert_equal "black_win", game.result
-    assert_equal "king_captured", game.end_reason
+    assert_equal "checkmate", game.end_reason
 
     as(@alice) do
       get game_path(game)
       assert_select ".result-loss .result-title", "Поражение"
-      assert_select ".result-reason", "Король взят"
+      assert_select ".result-reason", "Мат"
+      assert_select ".square.is-check[data-square='e1']"
     end
+
+    as(@bob) do
+      get game_path(game)
+      assert_select ".result-win .result-title", "Победа"
+    end
+  end
+
+  test "a player in check can only play moves that save the king" do
+    game = start_game
+
+    take_turn(@alice, game, dice: [ 1, 4 ], die: 1, from: "f2", to: "f3")
+    take_turn(@bob, game, dice: [ 1, 4 ], die: 1, from: "e7", to: "e5")
+    take_turn(@alice, game, dice: [ 6, 6 ], die: 6, from: "e1", to: "f2")
+    take_turn(@bob, game, dice: [ 5, 4 ], die: 5, from: "d8", to: "h4")
+    assert_predicate game.reload, :active?
+
+    rig_dice(1, 1)
+    as(@alice) do
+      get game_path(game)
+      assert_select ".square.is-check[data-square='f2']"
+      assert_select ".alert-warning", /Вам шах/
+
+      post roll_game_path(game)
+      post choose_game_path(game), params: { die: 1 }
+      follow_redirect!
+      assert_select ".square.is-clickable", 1
+      assert_select ".square.is-clickable[data-square='g2']"
+
+      post move_game_path(game), params: { from: "a2", to: "a3" }
+      follow_redirect!
+      assert_select ".alert-error", /так ходить нельзя/
+
+      get game_path(game, from: "g2")
+      assert_select ".square.is-target", 1
+      assert_select "form[action=?] input[name=to][value=g3]", move_game_path(game)
+    end
+  end
+
+  test "a creator can leave a waiting game for the lobby or cancel it" do
+    as(@alice) { post games_path, params: { color: "white", control: "600+0" } }
+    game = Game.order(:id).last
+
+    as(@alice) do
+      get game_path(game)
+      assert_select "a[href=?]", root_path, text: "В лобби"
+      assert_select "form[action=?] input[name=_method][value=delete]", game_path(game)
+
+      get root_path
+      assert_select ".game-card", /Свободно/
+    end
+
+    as(@bob) do
+      delete game_path(game)
+      follow_redirect!
+      assert_select ".alert-error", /не участвуете/
+    end
+    assert Game.exists?(game.id)
+
+    as(@alice) do
+      delete game_path(game)
+      assert_redirected_to root_path
+      follow_redirect!
+      assert_select ".alert-success", "Партия отменена."
+      assert_select ".lobby-section", /Активных партий нет/
+    end
+    assert_not Game.exists?(game.id)
+
+    as(@bob) do
+      get root_path
+      assert_select ".game-card", 0
+    end
+  end
+
+  test "a started game cannot be cancelled and offers a way back to the lobby" do
+    game = start_game
+
+    as(@alice) do
+      get game_path(game)
+      assert_select "a[href=?]", root_path, text: "В лобби"
+      assert_select "form[action=?] input[name=_method][value=delete]", game_path(game), count: 0
+
+      delete game_path(game)
+      follow_redirect!
+      assert_select ".alert-error", /ждёт соперника/
+    end
+    assert Game.exists?(game.id)
   end
 
   test "a roll with no playable piece can be thrown again" do

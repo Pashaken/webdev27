@@ -184,9 +184,9 @@ test "a knight jumps over pieces but cannot land on its own" do
 end
 
   test "a king steps to any free or enemy square around it" do
-    board = position("8/8/8/2ppp3/2pKp3/2PPP3/8/8")
+    board = position("8/8/8/8/2pK4/2PP4/8/8")
 
-    assert_equal %w[c5 d5 e5 c4 e4].sort, board.moves_from("d4").sort
+    assert_equal %w[c4 c5 d5 e3 e4 e5], board.moves_from("d4").sort
   end
 
   test "castling is offered when the way is free and the rights are kept" do
@@ -222,5 +222,93 @@ end
     assert_equal "e8=Q", position("8/4P3/8/8/8/8/8/8").simple_san(from: "e7", to: "e8", promotion: "q")
     assert_equal "O-O", position("8/8/8/8/8/8/8/4K2R").simple_san(from: "e1", to: "g1")
     assert_equal "O-O-O", position("8/8/8/8/8/8/8/R3K3").simple_san(from: "e1", to: "c1")
+  end
+end
+
+class PositionCheckTest < ActiveSupport::TestCase
+  def position(placement)
+    Position.from_placement(placement)
+  end
+
+  test "every kind of piece gives check" do
+    assert position("4k3/8/8/8/8/8/8/4R3").in_check?("black")
+    assert position("4k3/8/8/8/B7/8/8/4K3").in_check?("black")
+    assert position("4k3/8/3N4/8/8/8/8/4K3").in_check?("black")
+    assert position("4k3/3P4/8/8/8/8/8/4K3").in_check?("black")
+    assert position("4k3/4Q3/8/8/8/8/8/4K3").in_check?("black")
+    assert position("8/8/8/8/8/8/4k3/4K3").in_check?("white")
+    assert position("8/8/8/8/8/3p4/4K3/8").in_check?("white")
+  end
+
+  test "a blocked line and a pawn straight ahead give no check" do
+    assert_not position("4k3/4p3/8/8/8/8/8/4R3").in_check?("black")
+    assert_not position("4k3/4P3/8/8/8/8/8/4K3").in_check?("black")
+    assert_not position("4K3/8/8/8/8/8/8/8").in_check?("white")
+  end
+
+  test "a pinned piece cannot leave the line of the attack" do
+    assert_empty position("4k3/4r3/8/8/8/8/4B3/4K3").moves_from("e2")
+    assert_equal %w[e3 e4 e5 e6 e7], position("4k3/4r3/8/8/8/8/4R3/4K3").moves_from("e2").sort
+  end
+
+  test "a king cannot step onto an attacked square" do
+    board = position("8/8/8/8/8/5r2/8/4K3")
+
+    assert_equal %w[d1 d2 e2], board.moves_from("e1").sort
+  end
+
+  test "in check only moves that remove the check are possible" do
+    board = position("4k3/8/8/8/8/8/3PP3/r3K3")
+
+    assert_equal %w[f2], board.moves_from("e1")
+    assert_empty board.moves_from("d2")
+    assert_empty board.moves_from("e2")
+  end
+
+  test "the check can be blocked or the attacker captured" do
+    blocked = position("k3r3/8/8/8/8/8/3B4/4K3")
+    assert_equal %w[e3], blocked.moves_from("d2")
+    assert_equal %w[d1 f1 f2], blocked.moves_from("e1").sort
+
+    captured = position("k7/8/8/8/8/8/4q3/4K3")
+    assert_equal %w[e2], captured.moves_from("e1")
+  end
+
+  test "castling is not allowed out of, through or into check" do
+    assert_includes position("4k3/8/8/8/8/8/8/R3K2R").moves_from("e1"), "g1"
+
+    out_of = position("4k3/8/8/8/4r3/8/8/R3K2R")
+    assert_not_includes out_of.moves_from("e1"), "g1"
+    assert_not_includes out_of.moves_from("e1"), "c1"
+
+    through = position("4k3/8/8/8/8/8/5r2/R3K2R")
+    assert_not_includes through.moves_from("e1"), "g1"
+
+    into = position("4k3/8/8/8/8/8/6r1/R3K2R")
+    assert_not_includes into.moves_from("e1"), "g1"
+    assert_includes into.moves_from("e1"), "c1"
+  end
+
+  test "checkmate and stalemate are positions without moves" do
+    mate = position("rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR")
+    assert mate.in_check?("white")
+    assert_not mate.any_moves?("white")
+    assert mate.any_moves?("black")
+
+    stalemate = position("7k/5Q2/6K1/8/8/8/8/8")
+    assert_not stalemate.in_check?("black")
+    assert_not stalemate.any_moves?("black")
+  end
+
+  test "a copy of a position does not share the board" do
+    start = Position.start
+    copy = start.dup
+    copy.apply(from: "e2", to: "e4")
+
+    assert start.any_moves?("white")
+    assert_equal "wp", start.pieces["e2"]
+    assert_nil copy.pieces["e2"]
+    assert_equal "e1", start.king_square("white")
+    assert_nil position("8/8/8/8/8/8/8/8").king_square("white")
   end
 end

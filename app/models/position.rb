@@ -7,8 +7,8 @@ class Position
   DIAGONALS = [ [ 1, 1 ], [ 1, -1 ], [ -1, 1 ], [ -1, -1 ] ].freeze
   STRAIGHTS = [ [ 1, 0 ], [ -1, 0 ], [ 0, 1 ], [ 0, -1 ] ].freeze
   CASTLING_ROUTES = {
-    "K" => { rook: "h", path: %w[f g], target: "g" },
-    "Q" => { rook: "a", path: %w[d c b], target: "c" }
+    "K" => { rook: "h", path: %w[f g], pass: "f", target: "g" },
+    "Q" => { rook: "a", path: %w[d c b], pass: "d", target: "c" }
   }.freeze
 
   attr_reader :pieces, :turn, :en_passant, :halfmove_clock, :fullmove_number
@@ -58,20 +58,30 @@ class Position
     "p" if pieces[from]&.end_with?("p") && from[0] != to[0]
   end
 
+  def initialize_copy(source)
+    super
+    @pieces = source.pieces.dup
+    @castling = @castling.dup
+  end
+
   def moves_from(square)
     piece = pieces[square]
     return [] if piece.nil?
 
-    color = piece[0]
-    case piece[1]
-    when "p" then pawn_moves(square, color)
-    when "n" then step_moves(square, color, KNIGHT_STEPS)
-    when "k" then step_moves(square, color, KING_STEPS) + castling_moves(square, color)
-    when "b" then slide_moves(square, color, DIAGONALS)
-    when "r" then slide_moves(square, color, STRAIGHTS)
-    when "q" then slide_moves(square, color, DIAGONALS + STRAIGHTS)
-    else []
-    end
+    reachable_squares(square, piece[0]).reject { |target| dup.apply(from: square, to: target).in_check?(piece[0]) }
+  end
+
+  def king_square(color)
+    pieces.key("#{color[0]}k")
+  end
+
+  def in_check?(color)
+    square = king_square(color)
+    !square.nil? && attacked?(square, color[0] == "w" ? "b" : "w")
+  end
+
+  def any_moves?(color)
+    pieces.keys.any? { |square| pieces[square].start_with?(color[0]) && moves_from(square).any? }
   end
 
   def moves_for(color, type)
@@ -195,14 +205,47 @@ class Position
     pieces.delete("#{to[0]}#{from[1]}")
   end
 
+  def reachable_squares(square, color)
+    case pieces[square][1]
+    when "p" then pawn_moves(square, color)
+    when "n" then step_moves(square, color, KNIGHT_STEPS)
+    when "k" then step_moves(square, color, KING_STEPS) + castling_moves(square, color)
+    when "b" then slide_moves(square, color, DIAGONALS)
+    when "r" then slide_moves(square, color, STRAIGHTS)
+    when "q" then slide_moves(square, color, DIAGONALS + STRAIGHTS)
+    else []
+    end
+  end
+
+  def attacked?(square, by)
+    pawn_rank = by == "w" ? -1 : 1
+
+    [ -1, 1 ].any? { |file_step| pieces[offset(square, file_step, pawn_rank)] == "#{by}p" } ||
+      KNIGHT_STEPS.any? { |file_step, rank_step| pieces[offset(square, file_step, rank_step)] == "#{by}n" } ||
+      KING_STEPS.any? { |file_step, rank_step| pieces[offset(square, file_step, rank_step)] == "#{by}k" } ||
+      slider_attacks?(square, by, DIAGONALS, "b") ||
+      slider_attacks?(square, by, STRAIGHTS, "r")
+  end
+
+  def slider_attacks?(square, by, directions, type)
+    directions.any? do |file_step, rank_step|
+      current = offset(square, file_step, rank_step)
+      current = offset(current, file_step, rank_step) while current && pieces[current].nil?
+
+      current && [ "#{by}#{type}", "#{by}q" ].include?(pieces[current])
+    end
+  end
+
   def castling_moves(square, color)
     rank = color == "w" ? "1" : "8"
-    return [] unless square == "e#{rank}"
+    enemy = color == "w" ? "b" : "w"
+    return [] unless square == "e#{rank}" && !attacked?(square, enemy)
 
     CASTLING_ROUTES.filter_map do |right, route|
       held = color == "w" ? right : right.downcase
       next unless @castling.include?(held) && pieces["#{route[:rook]}#{rank}"] == "#{color}r"
       next unless route[:path].all? { |file| pieces["#{file}#{rank}"].nil? }
+      next if attacked?("#{route[:pass]}#{rank}", enemy)
 
       "#{route[:target]}#{rank}"
     end

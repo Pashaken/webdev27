@@ -22,6 +22,13 @@ module ActiveSupport
       game
     end
 
+    def play_move(game, user, from, to, die: nil)
+      die ||= Game::DICE_PIECES.key(game.position.pieces[from][1])
+      game.roll_dice!(user, random: rigged(die, die))
+      game.choose_die!(user, die)
+      game.play_move!(user: user, from: from, to: to)
+    end
+
     def make_move(game, user, dice:, die:, piece:, from: "e2", to: "e4", **options)
       game.roll_dice!(user, random: rigged(*dice))
       game.choose_die!(user, die)

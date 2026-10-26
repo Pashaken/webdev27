@@ -15,6 +15,10 @@ module UiHelper
     "Фигуры и кубики" => %w[--piece-white --piece-white-edge --piece-black --piece-black-edge --die-face --die-edge --die-pip]
   }.freeze
 
+  def ui_asset(name)
+    "/ui/#{name}?v=#{Rails.public_path.join('ui', name).mtime.to_i}"
+  end
+
   def board_squares(flipped: false)
     ranks = flipped ? 1.upto(8).to_a : 8.downto(1).to_a
     files = flipped ? FILES.reverse : FILES

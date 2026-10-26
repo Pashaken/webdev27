@@ -29,8 +29,16 @@ class GamesController < ApplicationController
     @mine = @game.my_turn?(current_user)
     @playable = @mine && @roll ? @game.playable_dice(@position) : []
     @legal = @mine ? @game.legal_moves(@position) : {}
+    @check = @mine && @position.in_check?(@game.turn)
     @selected = params[:from] if @legal.key?(params[:from])
     @refresh = !@game.finished? && !@mine
+  end
+
+  def destroy
+    @game.cancel!(current_user)
+    redirect_to root_path, notice: "Партия отменена."
+  rescue Game::Error => error
+    redirect_to game_path(@game), alert: error.message
   end
 
   def join
