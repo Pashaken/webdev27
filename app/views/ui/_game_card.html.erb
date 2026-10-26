@@ -2,12 +2,12 @@
 
 <article class="game-card">
   <div class="game-card-players">
-    <% [ [ "w", white ], [ "b", black ] ].each do |color, (name, rating)| %>
+    <% [ [ "w", white ], [ "b", black ] ].each do |color, (name, rating, url)| %>
       <div class="game-card-player">
         <%= tag.span class: "piece-icon", data: { piece: "#{color}k" }, aria: { label: color == "w" ? "Белые" : "Чёрные" } %>
         <% if name %>
           <span class="avatar avatar-sm"><%= name.first.upcase %></span>
-          <span><%= name %></span>
+          <span><%= url ? link_to(name, url, class: "player-link") : name %></span>
           <span class="muted"><%= rating %></span>
         <% else %>
           <span class="muted">Свободно</span>

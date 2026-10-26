@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   post "login", to: "sessions#create"
   delete "logout", to: "sessions#destroy"
 
+  get "leaderboard", to: "leaderboard#index", as: :leaderboard
   get "profile", to: "profiles#show", as: :profile
   get "players/:id", to: "profiles#show", as: :player
 

@@ -3,6 +3,7 @@
 <% running = game.active? && game.turn == color %>
 
 <%= render "ui/player", name: seat&.user&.username || "Ждём соперника",
+                        url: (player_path(seat.user) if seat),
                         rating: seat ? (seat.rating_before || seat.user.rating) : "—",
                         clock: clock_text(left),
                         active: running,

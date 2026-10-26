@@ -90,6 +90,72 @@ class ProfileTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "the history is split into pages with the newest games first" do
+    games = Array.new(22) { start_game.tap { |game| game.resign!(users(:bob)) } }
+
+    as(@alice) do
+      get profile_path
+      assert_select "tbody tr", 20
+      assert_select "tbody tr:first-child a[href=?]", game_path(games.last), text: "Открыть"
+      assert_select ".pager .caption", "Страница 1"
+      assert_select ".pager a[href=?]", player_path(users(:alice), page: 2), text: "Раньше ›"
+      assert_select ".pager a", text: "‹ Позже", count: 0
+
+      get player_path(users(:alice), page: 2)
+      assert_select "tbody tr", 2
+      assert_select "tbody tr:last-child a[href=?]", game_path(games.first), text: "Открыть"
+      assert_select ".pager a[href=?]", player_path(users(:alice), page: 1), text: "‹ Позже"
+      assert_select ".pager a", text: "Раньше ›", count: 0
+    end
+  end
+
+  test "a wrong page number falls back to a sensible page" do
+    start_game.resign!(users(:bob))
+
+    as(@alice) do
+      get player_path(users(:alice), page: "abc")
+      assert_response :success
+      assert_select "tbody tr", 1
+
+      get player_path(users(:alice), page: -5)
+      assert_select "tbody tr", 1
+
+      get player_path(users(:alice), page: "999999999999999999999")
+      assert_response :success
+      assert_select ".profile-section", /Завершённых партий пока нет/
+    end
+  end
+
+  test "a finished game of another player can be opened and watched" do
+    game = start_game
+    play_move(game, users(:alice), "e2", "e4")
+    game.resign!(users(:bob))
+    carol = sign_in("carol")
+
+    as(carol) do
+      get player_path(users(:alice))
+      assert_select "tbody td a[href=?]", game_path(game), text: "Открыть"
+
+      get game_path(game)
+      assert_response :success
+      assert_select ".alert", /Победили белые/
+      assert_select ".square[data-square='e4'] .piece[data-piece='wp']"
+      assert_select ".move", /e4/
+      assert_select ".game.has-dice", 0
+      assert_select "form[action=?]", roll_game_path(game), count: 0
+    end
+  end
+
+  test "players on the game page lead to their profiles" do
+    game = start_game
+
+    as(@alice) do
+      get game_path(game)
+      assert_select ".player-name a[href=?]", player_path(users(:alice)), text: "alice"
+      assert_select ".player-name a[href=?]", player_path(users(:bob)), text: "bob"
+    end
+  end
+
   test "an unknown player is not found" do
     as(@alice) do
       get player_path(id: 0)

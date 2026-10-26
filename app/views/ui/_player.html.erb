@@ -2,7 +2,7 @@
   <span class="avatar"><%= name.first.upcase %></span>
 
   <div class="player-info">
-    <span class="player-name"><%= name %></span>
+    <span class="player-name"><%= local_assigns[:url] ? link_to(name, url, class: "player-link") : name %></span>
     <span class="player-meta">Рейтинг <%= rating %></span>
   </div>
 

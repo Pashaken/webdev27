@@ -26,6 +26,7 @@ class HappyPathTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_select ".alert", /Ждём соперника/
       assert_select ".game[data-poll-url=?]", state_game_path(game)
+      assert_select ".game.has-dice", 0
       assert_select "form[action=?]", roll_game_path(game), count: 0
     end
 
@@ -40,6 +41,7 @@ class HappyPathTest < ActionDispatch::IntegrationTest
       assert_select ".alert", /Ход соперника/
       assert_select ".game[data-poll-url=?]", state_game_path(game)
       assert_select ".board .square", 64
+      assert_select ".game.has-dice > .game-dice .dice-tray"
     end
 
     assert_predicate game.reload, :active?
@@ -111,6 +113,7 @@ class HappyPathTest < ActionDispatch::IntegrationTest
       get game_path(game)
       assert_select ".result-win .result-title", "Победа"
       assert_select ".result-reason", "Соперник сдался"
+      assert_select ".game.has-dice", 0
       assert_select ".badge", "Рейтинг +16"
       assert_select "form[action=?]", roll_game_path(game), count: 0
 

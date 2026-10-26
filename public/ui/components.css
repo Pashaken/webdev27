@@ -5,10 +5,12 @@
 
 .header-inner {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-3);
+  gap: var(--space-2) var(--space-3);
   min-height: 60px;
+  padding-block: var(--space-2);
 }
 
 .brand {
@@ -24,8 +26,9 @@
 
 .nav {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 14px;
+  gap: var(--space-2) 14px;
 }
 
 .nav-user {
@@ -41,6 +44,10 @@
   color: var(--text);
   font-weight: 500;
   text-decoration: none;
+}
+
+.nav-link[aria-current="page"] {
+  color: var(--accent);
 }
 
 .nav-link:hover {
@@ -975,4 +982,17 @@ textarea.input {
   right: 0;
   left: auto;
   transform: none;
+}
+
+.table tr.is-me td {
+  background: var(--surface-muted);
+  font-weight: 700;
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
 }

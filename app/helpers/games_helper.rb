@@ -19,7 +19,7 @@ module GamesHelper
 
   def lobby_player(game, color)
     seat = game.game_player_of(color)
-    [ seat.user.username, seat.rating_before || seat.user.rating ] if seat
+    [ seat.user.username, seat.rating_before || seat.user.rating, player_path(seat.user) ] if seat
   end
 
   def outcome_badge(outcome)

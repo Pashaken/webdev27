@@ -499,16 +499,18 @@
 
   <section class="guide-section" id="game">
     <h2>Партия целиком</h2>
-    <div class="game">
-      <div class="game-main">
-        <%= render "ui/player", name: "bob", rating: 1480, clock: "09:42" %>
-        <%= render "ui/board", pieces: italian, marks: italian_marks %>
-        <%= render "ui/player", name: "alice", rating: 1512, clock: "08:15", active: true %>
-
+    <div class="game has-dice">
+      <div class="game-dice">
         <div class="dice-tray">
           <%= render "ui/die", value: 2, state: :selected, piece: "wn" %>
           <%= render "ui/die", value: 5, piece: "wq" %>
         </div>
+      </div>
+
+      <div class="game-main">
+        <%= render "ui/player", name: "bob", rating: 1480, clock: "09:42" %>
+        <%= render "ui/board", pieces: italian, marks: italian_marks %>
+        <%= render "ui/player", name: "alice", rating: 1512, clock: "08:15", active: true %>
       </div>
 
       <aside class="game-side">

@@ -29,6 +29,8 @@
           </button>
 
           <% if current_user %>
+            <%= link_to "Лобби", root_path, class: "nav-link", aria: { current: ("page" if current_page?(root_path)) } %>
+            <%= link_to "Рейтинг", leaderboard_path, class: "nav-link", aria: { current: ("page" if current_page?(leaderboard_path)) } %>
             <%= link_to current_user.username, profile_path, class: "nav-link nav-user" %>
             <%= button_to "Выйти", logout_path, method: :delete, class: "btn btn-ghost btn-sm", form_class: "nav-form" %>
           <% else %>

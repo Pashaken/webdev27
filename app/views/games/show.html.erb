@@ -1,10 +1,17 @@
 <% content_for :title, "DiceChess — Партия №#{@game.id}" %>
+<% content_for :main_class, "main-tight" %>
 
 <% me = @game.game_player_for(current_user) %>
 <% bottom = me ? me.color : "white" %>
 <% top = bottom == "white" ? "black" : "white" %>
 
-<%= tag.div class: "game", data: { poll_url: (state_game_path(@game) if @poll), version: @version } do %>
+<%= tag.div class: [ "game", ("has-dice" if @game.active?) ], data: { poll_url: (state_game_path(@game) if @poll), version: @version } do %>
+  <% if @game.active? %>
+    <div class="game-dice">
+      <%= render "games/dice", game: @game, roll: @roll, mine: @mine, playable: @playable %>
+    </div>
+  <% end %>
+
   <div class="game-main">
     <%= render "games/player", game: @game, color: top, moves: @moves %>
 
@@ -13,10 +20,6 @@
                            actions: board_actions(@game, @legal, @selected) %>
 
     <%= render "games/player", game: @game, color: bottom, moves: @moves %>
-
-    <% if @game.active? %>
-      <%= render "games/dice", game: @game, roll: @roll, mine: @mine, playable: @playable %>
-    <% end %>
   </div>
 
   <aside class="game-side">
