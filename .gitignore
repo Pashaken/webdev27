@@ -6,3 +6,5 @@
 /config/master.key
 /.env*
 /certs
+/certbot
+/letsencrypt

@@ -10,3 +10,5 @@ compose.yaml
 README.md
 /certs
 /nginx
+/certbot
+/letsencrypt
